@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>First Rep</title>
+<meta name="description" content="Feeling lost in the gym? A short workout plan, machine guides and quiet hours for UCCS students.">
+<meta name="theme-color" content="#0F1013">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="First Rep">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+body{margin:0;font-size:14px;font-family:system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
+img{max-width:100%}
+[hidden]{display:none!important}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+</style>
+<style>
+/* Layout: phone-width column, fixed tab bar. Black + loud gold hero; every gym area has its own bold color used everywhere it appears. */
+:root{
+  --bg:#EEF0F4; --surface:#FFFFFF; --surface-2:#F6F7FA; --ink:#0F1013; --muted:#585D68; --line:#E0E3EA;
+  --gold:#FFC72C; --gold-ink:#8A6200; --gold-soft:#FFF2C7;
+  --hero:#0F1013; --hero-fg:#FFFFFF; --hero-muted:#B4B7BF;
+  --cardio:#E63E1C; --machine:#2563EB; --cable:#7C3AED; --free:#0A8F55; --stretch:#0891B2; --other:#B45309;
+  --good:#0A8F55; --warn:#C27803; --bad:#DC2626; --on-color:#FFFFFF;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:16px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A0B0D; --surface:#16181D; --surface-2:#1D2026; --ink:#F5F5F2; --muted:#A1A6B0; --line:#2A2E36;
+  --gold:#FFC72C; --gold-ink:#FFD45C; --gold-soft:#2E2610;
+  --hero:#1A1C22; --hero-fg:#FFFFFF; --hero-muted:#A9ADB6;
+  --cardio:#FF5A36; --machine:#4D8BFF; --cable:#9F6BFF; --free:#22C27A; --stretch:#22B8D6; --other:#F59E0B;
+  --good:#22C27A; --warn:#F5B02E; --bad:#FF5A5A; --on-color:#FFFFFF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A0B0D; --surface:#16181D; --surface-2:#1D2026; --ink:#F5F5F2; --muted:#A1A6B0; --line:#2A2E36;
+  --gold:#FFC72C; --gold-ink:#FFD45C; --gold-soft:#2E2610;
+  --hero:#1A1C22; --hero-fg:#FFFFFF; --hero-muted:#A9ADB6;
+  --cardio:#FF5A36; --machine:#4D8BFF; --cable:#9F6BFF; --free:#22C27A; --stretch:#22B8D6; --other:#F59E0B;
+  --good:#22C27A; --warn:#F5B02E; --bad:#FF5A5A; --on-color:#FFFFFF; color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.app{max-width:480px;margin:0 auto;min-height:100%;box-sizing:border-box;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px calc(100px + env(safe-area-inset-bottom,0px))}
+.app.no-tabs{padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1;margin:0;text-wrap:balance}
+h1{font-size:2.6rem;text-transform:uppercase;font-style:italic;letter-spacing:-.005em}
+h2{font-size:1.7rem;text-transform:uppercase;font-style:italic}
+h3{font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:.01em}
+p{margin:0}
+a{color:var(--machine);font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink)}
+.stack{display:flex;flex-direction:column;gap:12px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+.row{display:flex;align-items:center;gap:12px}
+.between{justify-content:space-between}
+.hl{background:linear-gradient(transparent 58%,var(--gold) 58%);padding:0 .08em}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:6px 4px}
+.brand{font-family:var(--display);font-weight:800;font-style:italic;font-size:1.6rem;letter-spacing:.01em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.brand-mark{width:30px;height:30px;border-radius:8px;background:var(--gold);display:grid;place-items:center;color:#0F1013;font-size:1.15rem;transform:skewX(-8deg)}
+.top-right{display:flex;gap:8px;align-items:center}
+.lvl-chip{border:0;background:var(--ink);color:var(--bg);border-radius:999px;height:36px;padding:0 12px 0 6px;font:700 .8rem var(--body);display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.lvl-chip i{font-style:normal;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#0F1013;display:grid;place-items:center;font-size:.72rem;font-weight:800}
+.circle-btn{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:50%;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;padding:0}
+.circle-btn svg{width:18px;height:18px}
+.back{border:0;background:none;color:var(--ink);font:700 .95rem var(--body);display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:6px 0}
+
+/* buttons */
+.btn{appearance:none;border:0;border-radius:14px;padding:16px 18px;font:800 1.05rem var(--body);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;text-decoration:none;box-sizing:border-box;transition:transform .12s}
+.btn:active{transform:scale(.98)}
+.btn-gold{background:var(--gold);color:#0F1013;box-shadow:0 6px 0 -2px color-mix(in srgb,var(--gold) 55%,#000)}
+.btn-dark{background:var(--ink);color:var(--bg)}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--machine);outline-offset:2px}
+
+/* surfaces */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.hero{background:var(--hero);color:var(--hero-fg);border-radius:22px;padding:22px 20px 20px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.hero > *{position:relative}
+.hero::before{content:"";position:absolute;right:-30px;top:-30px;width:190px;height:190px;background:repeating-linear-gradient(-45deg,var(--gold) 0 10px,transparent 10px 22px);opacity:.22;border-radius:50%}
+.hero .eyebrow{color:var(--gold)}
+.hero h2{font-size:2.5rem;line-height:.92}
+.hero .meta{color:var(--hero-muted);font-size:.9rem;display:flex;gap:6px 14px;flex-wrap:wrap}
+.hero .meta b{color:var(--hero-fg)}
+.hero-chips{display:flex;gap:6px;flex-wrap:wrap}
+
+/* week strip */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wd{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:.72rem;font-weight:700;color:var(--muted)}
+.wd i{width:100%;max-width:38px;aspect-ratio:1;border-radius:50%;background:var(--surface);border:2px solid var(--line);display:grid;place-items:center;font-style:normal;color:#0F1013;box-sizing:border-box}
+.wd.on i{background:var(--gold);border-color:var(--gold)}
+.wd.today{color:var(--ink)}
+.wd.today i{border-color:var(--ink)}
+.wd.on.today i{border-color:var(--ink)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-family:var(--display);font-weight:800;font-size:2.1rem;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;color:var(--muted);font-weight:500;line-height:1.3}
+.stat.c1 b{color:var(--cardio)} .stat.c2 b{color:var(--machine)} .stat.c3 b{color:var(--free)}
+
+/* colored tiles */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{border:0;border-radius:var(--r);padding:16px 14px;text-align:left;cursor:pointer;color:var(--on-color);font:inherit;display:flex;flex-direction:column;gap:6px;min-height:118px;position:relative;overflow:hidden;transition:transform .12s}
+.tile:active{transform:scale(.97)}
+.tile svg{width:28px;height:28px}
+.tile b{font-family:var(--display);font-weight:800;font-style:italic;text-transform:uppercase;font-size:1.35rem;line-height:1}
+.tile span{font-size:.82rem;line-height:1.35;opacity:.92}
+.tile::after{content:"";position:absolute;right:-22px;bottom:-22px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.14)}
+.t-cardio{background:var(--cardio)} .t-machine{background:var(--machine)} .t-cable{background:var(--cable)} .t-free{background:var(--free)}
+
+/* tip */
+.tip{background:var(--gold-soft);border-radius:var(--r);padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.tip .bulb{flex:none;width:34px;height:34px;border-radius:10px;background:var(--gold);display:grid;place-items:center;color:#0F1013}
+.tip .bulb svg{width:18px;height:18px}
+.tip b{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink)}
+
+/* busy meter */
+.meter{display:flex;align-items:flex-end;gap:3px;height:64px}
+.meter i{flex:1;border-radius:4px 4px 1px 1px;min-height:4px;opacity:.35}
+.meter i.q{background:var(--good)} .meter i.m{background:var(--warn)} .meter i.b{background:var(--bad)}
+.meter i.now{opacity:1;outline:2px solid var(--ink);outline-offset:1px}
+.meter-axis{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:6px}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:.8rem;font-weight:800;white-space:nowrap}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.quiet{color:var(--on-color);background:var(--good)}
+.pill.moderate{color:#0F1013;background:var(--warn)}
+.pill.busy{color:var(--on-color);background:var(--bad)}
+.pill.closed{color:var(--muted);background:var(--surface-2)}
+
+/* chips (area colors) */
+.chip{display:inline-flex;align-items:center;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;border-radius:6px;padding:3px 7px;white-space:nowrap}
+.a-cardio{--a:var(--cardio)} .a-machine{--a:var(--machine)} .a-cable{--a:var(--cable)} .a-free{--a:var(--free)} .a-stretch{--a:var(--stretch)} .a-other{--a:var(--other)}
+.chip{color:var(--a,var(--muted));background:color-mix(in srgb,var(--a,var(--muted)) 15%,transparent)}
+.hero .chip{background:rgba(255,255,255,.1);color:var(--hero-fg)}
+.mchip{display:inline-flex;font-size:.75rem;font-weight:700;border-radius:999px;padding:3px 9px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink)}
+
+/* progress */
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:4px;transition:width .4s}
+.hero .bar{background:rgba(255,255,255,.14)}
+
+/* onboarding */
+.ob{display:flex;flex-direction:column;gap:22px;padding-top:8px}
+.steps{display:flex;gap:6px}
+.steps i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.steps i.on{background:var(--gold)}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px;font:inherit;color:var(--ink);cursor:pointer;transition:transform .12s,border-color .12s}
+.choice:active{transform:scale(.98)}
+.choice .ic{width:46px;height:46px;border-radius:12px;background:var(--a,var(--gold));display:grid;place-items:center;flex:none;color:var(--on-color)}
+.choice .ic svg{width:24px;height:24px}
+.choice .ic.txt{font-family:var(--display);font-weight:800;font-size:1.5rem;font-style:italic}
+.choice b{display:block;font-size:1.02rem}
+.choice span span{display:block;font-size:.85rem;color:var(--muted)}
+.choice[aria-pressed="true"]{border-color:var(--a,var(--gold));box-shadow:0 0 0 2px var(--a,var(--gold))}
+.splash{display:flex;flex-direction:column;gap:18px;padding-top:6px}
+.splash-hero{background:var(--hero);color:var(--hero-fg);border-radius:24px;padding:26px 22px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.splash-hero > *{position:relative}
+.splash-hero::before{content:"";position:absolute;inset:auto -40px -60px auto;width:240px;height:240px;background:repeating-linear-gradient(-45deg,var(--gold) 0 12px,transparent 12px 26px);opacity:.2;border-radius:50%}
+.splash-hero .eyebrow{color:var(--gold)}
+.splash-hero h1{font-size:3.6rem;line-height:.88}
+.splash-hero h1 em{font-style:italic;color:var(--gold)}
+.splash-hero p{color:var(--hero-muted)}
+.promise{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0;padding:0;list-style:none}
+.promise li{border-radius:14px;padding:12px 10px;color:var(--on-color);display:flex;flex-direction:column;gap:6px;font-size:.8rem;line-height:1.3;font-weight:500}
+.promise li svg{width:22px;height:22px}
+.promise li:nth-child(1){background:var(--machine)} .promise li:nth-child(2){background:var(--cardio)} .promise li:nth-child(3){background:var(--free)}
+
+/* lists */
+.list{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.li{display:flex;align-items:center;gap:12px;padding:14px 16px;border-top:1px solid var(--line);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;box-sizing:border-box;text-align:left;font:inherit;color:var(--ink);cursor:pointer;text-decoration:none}
+.li:first-child{border-top:0}
+.li .grow{flex:1;min-width:0}
+.li .sub{font-size:.85rem;color:var(--muted);font-weight:400}
+.chev{color:var(--muted);flex:none}
+.check{width:28px;height:28px;border-radius:50%;border:2.5px solid var(--a,var(--line));flex:none;display:grid;place-items:center;color:transparent;box-sizing:border-box}
+.check.on{background:var(--a,var(--gold));border-color:var(--a,var(--gold));color:var(--on-color)}
+.mico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--a);color:var(--on-color)}
+.mico svg{width:22px;height:22px}
+.badge-day{font-family:var(--display);font-weight:800;font-style:italic;font-size:1.3rem;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--surface-2);border:2px solid var(--line);color:var(--ink);flex:none;box-sizing:border-box}
+.badge-day.done{background:var(--gold);border-color:var(--gold);color:#0F1013}
+.badge-day.next{border-color:var(--ink)}
+
+/* exercise rows */
+.ex{border-top:1px solid var(--line);padding:16px;display:flex;gap:12px;align-items:flex-start}
+.ex:first-child{border-top:0}
+.ex .grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ex .name{font-weight:800;font-size:1.02rem;line-height:1.25}
+.ex .name.done{text-decoration:line-through;color:var(--muted)}
+.ex .how{font-size:.88rem;color:var(--muted)}
+.ex .amt{font-family:var(--display);font-weight:800;font-size:1.3rem;line-height:1;font-variant-numeric:tabular-nums}
+.ex button.check{cursor:pointer;background:none;padding:0;margin-top:2px}
+.ex button.check.on{background:var(--a,var(--gold))}
+.ex-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.mini{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font:700 .8rem var(--body);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;flex:none}
+.mini svg{width:14px;height:14px}
+.mini.done{background:var(--gold);border-color:var(--gold);color:#0F1013}
+
+/* rest timer */
+.timer{position:fixed;left:0;right:0;bottom:0;z-index:15;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--hero);color:var(--hero-fg);box-shadow:0 -10px 30px rgba(0,0,0,.25)}
+.timer-in{max-width:480px;margin:0 auto;padding-block:14px;display:flex;align-items:center;gap:14px}
+.timer .t{font-family:var(--display);font-weight:800;font-size:2.6rem;line-height:1;font-variant-numeric:tabular-nums;color:var(--gold);min-width:84px}
+.timer .grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;font-size:.85rem}
+.timer .bar{background:rgba(255,255,255,.15)}
+.timer button{border:1.5px solid rgba(255,255,255,.25);background:transparent;color:var(--hero-fg);border-radius:999px;padding:8px 12px;font:700 .8rem var(--body);cursor:pointer}
+.timer.done .t{color:var(--good)}
+
+/* machine guide */
+.mhead{border-radius:22px;padding:22px 20px;color:var(--on-color);background:var(--a);display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.mhead > *{position:relative}
+.mhead::after{content:"";position:absolute;right:-50px;top:-50px;width:180px;height:180px;border-radius:50%;border:26px solid rgba(255,255,255,.14)}
+.mhead h1{font-size:2.8rem}
+.mhead .eyebrow{color:rgba(255,255,255,.85)}
+.mhead .mchip{background:rgba(255,255,255,.18);border-color:transparent;color:var(--on-color)}
+.lvl-dots{display:inline-flex;gap:4px;align-items:center;font-size:.8rem;font-weight:700}
+.lvl-dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.3)}
+.lvl-dots i.on{background:var(--on-color)}
+.video{aspect-ratio:16/9;max-width:100%;border-radius:var(--r);background:var(--hero);display:grid;place-items:center;text-align:center;color:var(--hero-muted);font-size:.85rem;padding:12px;box-sizing:border-box;position:relative;overflow:hidden}
+.video .play{width:58px;height:58px;border-radius:50%;background:var(--gold);display:grid;place-items:center;margin:0 auto 8px;color:#0F1013}
+.video b{display:block;color:var(--hero-fg);font-size:.95rem}
+ol.num{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:n}
+ol.num li{display:flex;gap:12px;align-items:flex-start;counter-increment:n}
+ol.num li::before{content:counter(n);flex:none;width:26px;height:26px;border-radius:8px;background:var(--a,var(--ink));color:var(--a-fg,var(--bg));display:grid;place-items:center;font:800 .85rem var(--body)}
+.cue-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cue{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:4px;font-size:.88rem;min-width:0}
+.cue b{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.callout{border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:4px;background:color-mix(in srgb,var(--bad) 10%,var(--surface));border:1.5px solid color-mix(in srgb,var(--bad) 35%,transparent)}
+.callout b{color:var(--bad);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+.callout.gold{background:var(--gold-soft);border-color:color-mix(in srgb,var(--gold) 60%,transparent)}
+.callout.gold b{color:var(--gold-ink)}
+
+/* phases */
+.phases{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ph{border-radius:12px;padding:10px 8px;background:var(--surface);border:1.5px solid var(--line);display:flex;flex-direction:column;gap:3px;font-size:.74rem;line-height:1.25;min-width:0}
+.ph b{font-family:var(--display);font-size:1.05rem;font-weight:800;text-transform:uppercase;font-style:italic;line-height:1}
+.ph.past{opacity:.55}
+.ph.cur{background:var(--gold);border-color:var(--gold);color:#0F1013}
+
+/* challenges */
+.lvl-card{background:var(--hero);color:var(--hero-fg);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.lvl-card > *{position:relative}
+.lvl-card::before{content:"";position:absolute;left:-40px;bottom:-70px;width:200px;height:200px;background:repeating-linear-gradient(45deg,var(--gold) 0 10px,transparent 10px 22px);opacity:.18;border-radius:50%}
+.lvl-card .big{font-family:var(--display);font-weight:800;font-style:italic;font-size:2.6rem;line-height:.9;text-transform:uppercase;color:var(--gold)}
+.lvl-card .eyebrow{color:var(--hero-muted)}
+.lvl-card .small{color:var(--hero-muted)}
+.lvl-card .bar{background:rgba(255,255,255,.14);height:10px}
+.chal{display:flex;gap:12px;align-items:center;padding:14px 16px;border-top:1px solid var(--line)}
+.chal:first-child{border-top:0}
+.chal .grow{flex:1;min-width:0}
+.chal .pts{font-size:.72rem;font-weight:800;color:var(--gold-ink)}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bdg{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.76rem;line-height:1.25;min-width:0}
+.bdg .medal{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-style:italic;font-size:1.35rem;background:var(--surface-2);border:2px dashed var(--line);color:var(--muted);box-sizing:border-box}
+.bdg.on .medal{background:var(--a);border:0;color:var(--on-color);box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 25%,transparent)}
+.bdg b{font-size:.85rem}
+
+/* hours table */
+.hours{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.92rem}
+.hours td{padding:9px 0;border-top:1px solid var(--line)}
+.hours tr:first-child td{border-top:0}
+.hours td:last-child{text-align:right}
+.hours tr.today td{font-weight:800}
+.hours tr.today td:first-child::after{content:"Today";margin-left:8px;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:#0F1013;border-radius:5px;padding:2px 6px}
+
+/* explore */
+.xcard{border-radius:var(--r);padding:18px 16px;color:var(--on-color);background:var(--a);display:flex;flex-direction:column;gap:8px;text-decoration:none;position:relative;overflow:hidden}
+.xcard > *{position:relative}
+.xcard::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.13)}
+.xcard h3{font-size:1.5rem;font-style:italic;font-weight:800}
+.xcard p{font-size:.9rem;opacity:.95}
+.xcard .good{font-size:.75rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:rgba(0,0,0,.18);align-self:flex-start;border-radius:6px;padding:3px 8px}
+.xcard .go{font-weight:800;font-size:.9rem}
+
+/* glossary */
+details{border-top:1px solid var(--line)}
+details:first-child{border-top:0}
+summary{padding:14px 16px;cursor:pointer;font-weight:800;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.3rem;color:var(--gold-ink);font-weight:800}
+details[open] summary::after{content:"−"}
+details p{padding:0 16px 14px;color:var(--muted);font-size:.9rem}
+
+/* tab bar */
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+.tabs nav{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:6px 8px}
+.tab{background:none;border:0;padding:6px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;font:700 .72rem var(--body);color:var(--muted);cursor:pointer;border-radius:12px}
+.tab svg{width:22px;height:22px}
+.tab[aria-current="page"]{color:var(--ink)}
+.tab[aria-current="page"] svg{background:var(--gold);color:#0F1013;border-radius:999px;padding:3px 14px;box-sizing:content-box}
+
+.foot{font-size:.75rem;color:var(--muted);text-align:center;padding-top:26px;line-height:1.45}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:.9rem;font-weight:700;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:20;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.fade{animation:fade .3s ease}
+@keyframes fade{from{opacity:.4;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:.3}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.fade,.pop{animation:none}.toast,.btn,.tile,.choice,.bar i{transition:none}}
+.big-num{font-family:var(--display);font-weight:800;font-style:italic;font-size:5.5rem;line-height:.85;color:var(--gold-ink)}
+.done-hero{background:var(--gold);color:#0F1013;border-radius:24px;padding:26px 22px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.done-hero > *{position:relative}
+.done-hero::before{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:repeating-linear-gradient(-45deg,#0F1013 0 8px,transparent 8px 20px);opacity:.08;border-radius:50%}
+.done-hero .big-num{color:#0F1013}
+.done-hero .eyebrow{color:#0F1013;opacity:.7}
+.done-hero h1{font-size:2.2rem}
+.pts-pill{align-self:flex-start;background:#0F1013;color:var(--gold);border-radius:999px;padding:6px 14px;font-weight:800;font-size:.9rem}
+textarea.invite{width:100%;min-height:110px;border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:.92rem;background:var(--surface);color:var(--ink);resize:vertical;box-sizing:border-box}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;height:100%}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="tabs" id="tabs"><nav>
+  <button class="tab" data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Home</button>
+  <button class="tab" data-go="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16"/></svg>My Plan</button>
+  <button class="tab" data-go="machines"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"/></svg>Machines</button>
+  <button class="tab" data-go="challenges"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Challenges</button>
+</nav></div>
+<div class="timer" id="timer" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(()=>{
+// ---------- config ----------
+const APP_URL = location.href.split("#")[0]; // the site's own address
+const REC = "https://campusrec.uccs.edu";
+
+// ---------- storage (per-device) ----------
+const KEY = "firstrep.v1";
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const S = Object.assign({ profile:null, log:[], manual:{}, pack:{} }, load());
+
+// ---------- dates ----------
+const pad = n => String(n).padStart(2,"0");
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function weekKey(d=new Date()){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return iso(x); }
+const thisWeek = () => S.log.filter(l => weekKey(new Date(l.d+"T12:00")) === weekKey());
+const reduceMotion = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+// ---------- Rec hours (Fall 2026, campusrec.uccs.edu) ----------
+const HOURS = { 0:[12,21], 1:[6,22], 2:[6,22], 3:[6,22], 4:[6,22], 5:[6,21], 6:[10,20] };
+const DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const fmtH = h => h===12 ? "12 pm" : h===0||h===24 ? "12 am" : h<12 ? `${h} am` : `${h-12} pm`;
+// Sample crowd pattern (0-100). Swap in real Rec headcounts when available.
+const WEEKDAY_BUSY = {6:18,7:28,8:32,9:30,10:36,11:46,12:58,13:50,14:56,15:72,16:86,17:92,18:80,19:64,20:44,21:24};
+const WEEKEND_BUSY = {10:30,11:42,12:50,13:55,14:52,15:48,16:44,17:38,18:30,19:22,20:16};
+function busyFor(day,h){ const t = (day===0||day===6) ? WEEKEND_BUSY : WEEKDAY_BUSY; const [o,c]=HOURS[day]; return (h>=o && h<c) ? (t[h] ?? 20) : null; }
+function level(v){ if(v===null) return ["closed","Closed now"]; if(v<45) return ["quiet","Quiet"]; if(v<70) return ["moderate","Moderate"]; return ["busy","Busy"]; }
+
+// ---------- icons ----------
+const sv = (p,w=2.2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ICON = {
+  chev:'<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>',
+  back:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  tick:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
+  map:sv('<path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>'),
+  machine:sv('<path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"/>'),
+  star:sv('<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'),
+  help:sv('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/>'),
+  friend:sv('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>'),
+  bulb:sv('<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'),
+  timer:sv('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/>',2.4),
+  play:'<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  heart:sv('<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>'),
+  bolt:sv('<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>'),
+  leaf:sv('<path d="M5 21c0-9 6-15 15-16-1 9-7 15-15 16zM5 21l7-7"/>'),
+  flag:sv('<path d="M5 21V4M5 4h12l-2 4 2 4H5"/>'),
+  calendar:sv('<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>'),
+  clock:sv('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  run:sv('<circle cx="14" cy="4.5" r="2"/><path d="M8 21l3-6 3 2v5M6 11l3-4 4 1 3 4h3"/>'),
+};
+
+// ---------- content ----------
+const GOALS = [
+  {id:"start",  a:"cardio",  ic:ICON.flag,  t:"Just get started", s:"Learn the basics and feel at home"},
+  {id:"strong", a:"machine", ic:ICON.machine,t:"Get stronger",     s:"Build muscle with simple machines"},
+  {id:"cardio", a:"free",    ic:ICON.heart, t:"Build cardio",     s:"More energy, easier stairs"},
+  {id:"calm",   a:"cable",   ic:ICON.leaf,  t:"Feel better",      s:"Less stress, move a little every week"},
+];
+const COMFORT = [
+  {id:"new",  ic:"0", t:"Never been",        s:"Keep it short and simple", f:1,   ds:0},
+  {id:"some", ic:"1", t:"Been a few times",  s:"I know some of the basics", f:1.3, ds:1},
+  {id:"comfy",ic:"2", t:"Pretty comfortable",s:"Give me a bit more",        f:1.7, ds:1},
+];
+const DAYS = [{id:2,t:"2 days a week",s:"A solid start"},{id:3,t:"3 days a week",s:"Most popular"},{id:4,t:"4 days a week",s:"If you're ready"}];
+
+function areaOf(w){
+  if(/Cardio/.test(w)) return "cardio";
+  if(/Machines/.test(w)) return "machine";
+  if(/Cables/.test(w)) return "cable";
+  if(/Dumbbells|Free/.test(w)) return "free";
+  if(/Stretch/.test(w)) return "stretch";
+  return "other";
+}
+
+// exercise: t = minutes (timed) or s/r = sets/reps; m = machine guide id; mu = muscles
+const W = {
+  start:[
+    {k:"A",n:"Tour + Walk",ex:[
+      {n:"Check in and find the locker room",t:3,fixed:true,w:"Front desk",h:"Scan your student ID. Ask the front desk where the cardio area is."},
+      {n:"Treadmill walk",t:8,w:"Cardio area",h:"Easy pace. You should be able to talk.",m:"treadmill"},
+      {n:"Leg press",s:2,r:"10 reps",w:"Machines",h:"Pick a light weight. Smooth and slow.",m:"leg-press"},
+      {n:"Stretch",t:3,w:"Stretch area",h:"Calves, quads and hamstrings, 20 seconds each.",mu:["Legs"]}]},
+    {k:"B",n:"Machine Sampler",ex:[
+      {n:"Bike warm-up",t:5,w:"Cardio area",h:"Easy spin. Adjust the seat to hip height.",m:"bike"},
+      {n:"Chest press",s:2,r:"10 reps",w:"Machines",h:"Light weight. Push out, slow back.",m:"chest-press"},
+      {n:"Lat pulldown",s:2,r:"10 reps",w:"Machines",h:"Pull the bar to your upper chest.",m:"lat-pulldown"},
+      {n:"Seated cable row",s:2,r:"10 reps",w:"Cables",h:"Sit tall, squeeze your shoulder blades.",m:"cable-row"},
+      {n:"Stretch",t:3,w:"Stretch area",h:"Chest, back and shoulders.",mu:["Upper body"]}]},
+    {k:"C",n:"Your Choice",ex:[
+      {n:"Elliptical or bike",t:10,w:"Cardio area",h:"Pick whichever looks less busy.",m:"elliptical"},
+      {n:"Leg press",s:2,r:"10 reps",w:"Machines",h:"Same weight as last time, or a little more.",m:"leg-press"},
+      {n:"Lat pulldown",s:2,r:"10 reps",w:"Machines",h:"Keep your chest up.",m:"lat-pulldown"},
+      {n:"Stretch",t:3,w:"Stretch area",h:"Whatever feels tight.",mu:["Full body"]}]},
+  ],
+  strong:[
+    {k:"A",n:"Full Body A",ex:[
+      {n:"Treadmill walk",t:5,w:"Cardio area",h:"Warm-up. Brisk but easy.",m:"treadmill"},
+      {n:"Leg press",s:2,r:"10 reps",w:"Machines",h:"Feet shoulder-width. Don't lock your knees.",m:"leg-press"},
+      {n:"Chest press",s:2,r:"10 reps",w:"Machines",h:"Handles at chest height.",m:"chest-press"},
+      {n:"Lat pulldown",s:2,r:"10 reps",w:"Machines",h:"Lean back slightly, pull to upper chest.",m:"lat-pulldown"},
+      {n:"Plank",s:2,r:"20 sec",w:"Stretch area",h:"Elbows under shoulders, straight line head to heels.",mu:["Core","Shoulders"]}]},
+    {k:"B",n:"Full Body B",ex:[
+      {n:"Bike warm-up",t:5,w:"Cardio area",h:"Easy spin.",m:"bike"},
+      {n:"Goblet squat",s:2,r:"10 reps",w:"Dumbbells",h:"Hold one dumbbell at your chest. Sit back like into a chair.",m:"dumbbells",mu:["Quads","Glutes","Core"]},
+      {n:"Seated cable row",s:2,r:"10 reps",w:"Cables",h:"Pull to your belly button.",m:"cable-row"},
+      {n:"Dumbbell shoulder press",s:2,r:"10 reps",w:"Dumbbells",h:"Sit on a bench with back support.",m:"dumbbells",mu:["Shoulders","Triceps"]},
+      {n:"Glute bridge",s:2,r:"12 reps",w:"Stretch area",h:"Squeeze at the top for a second.",mu:["Glutes","Hamstrings"]}]},
+    {k:"C",n:"Full Body C",ex:[
+      {n:"Elliptical warm-up",t:5,w:"Cardio area",h:"Easy pace.",m:"elliptical"},
+      {n:"Leg press",s:2,r:"10 reps",w:"Machines",h:"Try a little more weight than Day A.",m:"leg-press"},
+      {n:"Lat pulldown",s:2,r:"10 reps",w:"Machines",h:"Slow on the way up.",m:"lat-pulldown"},
+      {n:"Chest press",s:2,r:"10 reps",w:"Machines",h:"Exhale as you push.",m:"chest-press"},
+      {n:"Dead bug",s:2,r:"8 each side",w:"Stretch area",h:"Lower back stays flat on the floor.",mu:["Core"]}]},
+  ],
+  cardio:[
+    {k:"A",n:"Easy Intervals",ex:[
+      {n:"Treadmill warm-up walk",t:5,w:"Cardio area",h:"Easy pace.",m:"treadmill"},
+      {n:"1 min brisk / 1 min easy",t:10,w:"Cardio area",h:"Brisk walk or light jog, then recover. Repeat.",m:"treadmill"},
+      {n:"Cool-down walk + stretch",t:4,w:"Stretch area",h:"Calves and hips.",mu:["Legs","Hips"]}]},
+    {k:"B",n:"Mix It Up",ex:[
+      {n:"Bike",t:7,w:"Cardio area",h:"Steady, can-still-talk pace.",m:"bike"},
+      {n:"Rowing machine",t:5,w:"Cardio area",h:"Legs, then lean, then arms.",m:"rower"},
+      {n:"Elliptical",t:6,w:"Cardio area",h:"Push and pull the handles.",m:"elliptical"}]},
+    {k:"C",n:"Steady State",ex:[
+      {n:"Elliptical or bike",t:15,w:"Cardio area",h:"One steady pace the whole time. Headphones in.",m:"elliptical"},
+      {n:"Stretch",t:4,w:"Stretch area",h:"Hold each stretch 20 to 30 seconds.",mu:["Full body"]}]},
+  ],
+  calm:[
+    {k:"A",n:"Move + Breathe",ex:[
+      {n:"Treadmill walk",t:10,w:"Cardio area",h:"Easy pace, no phone scrolling. Just walk.",m:"treadmill"},
+      {n:"Full-body stretch",t:6,w:"Stretch area",h:"Neck, shoulders, hips, hamstrings.",mu:["Full body"]},
+      {n:"Box breathing",t:2,fixed:true,w:"Anywhere",h:"In 4, hold 4, out 4, hold 4.",mu:["Mind"]}]},
+    {k:"B",n:"Light Strength",ex:[
+      {n:"Bike warm-up",t:5,w:"Cardio area",h:"Easy spin.",m:"bike"},
+      {n:"Seated cable row",s:2,r:"10 reps",w:"Cables",h:"Light and smooth.",m:"cable-row"},
+      {n:"Leg press",s:2,r:"10 reps",w:"Machines",h:"Light weight.",m:"leg-press"},
+      {n:"Stretch",t:4,w:"Stretch area",h:"Slow breaths while you stretch.",mu:["Full body"]}]},
+    {k:"C",n:"Try a Class",ex:[
+      {n:"Mind/body group fitness class",t:45,fixed:true,w:"Group fitness studio",h:"Check the class schedule on the Rec site. Arrive 5 minutes early and tell the instructor it's your first time.",mu:["Full body","Mind"],cls:true}]},
+  ],
+};
+
+const MACHINES = {
+  "treadmill":{n:"Treadmill",area:"Cardio area",lvl:1,mu:["Heart","Legs"],
+    setup:["Stand on the side rails, not the belt.","Clip the safety cord to your shirt.","Press Quick Start. The belt starts slow."],
+    doit:["Use the + and − buttons to set your speed. 2.5 to 3.5 mph is a good walk.","Add a little incline (1 to 3) for a harder walk without running.","Press Stop, then step onto the side rails."],
+    breathe:"Breathe naturally. If you can't talk, slow down.",feel:"Easy and steady, like walking to class when you're a little late.",
+    mistake:"Holding the handrails the whole time. Swing your arms instead.",start:"10 minutes at a pace where you can still talk."},
+  "elliptical":{n:"Elliptical",area:"Cardio area",lvl:1,mu:["Heart","Legs","Arms"],
+    setup:["Step onto the pedals while holding the moving handles.","Start pedaling. The screen turns on by itself."],
+    doit:["Push and pull the handles while you pedal.","Raise the resistance if it feels like you're floating.","Stand tall and look ahead, not down."],
+    breathe:"Steady breathing. You should be able to say a full sentence.",feel:"Smooth gliding with no pounding on your knees.",
+    mistake:"Standing on your toes. Keep your whole foot on the pedal.",start:"8 to 10 minutes, resistance 3 to 5."},
+  "bike":{n:"Stationary Bike",area:"Cardio area",lvl:1,mu:["Heart","Quads","Glutes"],
+    setup:["Set the seat to hip height when standing next to it.","Your knee should be slightly bent at the bottom of a pedal stroke."],
+    doit:["Pedal at a steady pace.","Raise resistance a level or two once you're warm.","Sit back. Don't lean all your weight on the handlebars."],
+    breathe:"Breathe steadily. Slow down if you're gasping.",feel:"Light work in your thighs, never pain in your knees.",
+    mistake:"Seat too low, which strains your knees.",start:"5 to 10 minutes at a comfortable pace."},
+  "rower":{n:"Rowing Machine",area:"Cardio area",lvl:2,mu:["Back","Legs","Heart"],
+    setup:["Strap your feet in so the strap crosses the widest part.","Set the damper (the side dial) to 3 to 5."],
+    doit:["Push with your legs first.","Lean back slightly, then pull the handle to your ribs.","Return in reverse: arms, lean, legs."],
+    breathe:"Breathe out as you pull, in as you slide forward.",feel:"Your legs do most of the work, not your arms.",
+    mistake:"Pulling with your arms first. Most of the power comes from your legs.",start:"5 minutes, easy and smooth."},
+  "leg-press":{n:"Leg Press",area:"Machines",lvl:1,mu:["Quads","Glutes","Hamstrings"],
+    setup:["Sit with your back flat against the pad.","Feet shoulder-width apart in the middle of the platform.","Pick a light weight with the pin or plates."],
+    doit:["Release the safety handles.","Lower the platform slowly until your knees reach about 90 degrees.","Push back up through your heels."],
+    breathe:"Breathe out as you push, in as you lower.",feel:"Pressure in your thighs and glutes, not your lower back.",
+    mistake:"Locking your knees straight at the top. Keep a small bend.",start:"2 sets of 10 at a weight that feels easy to moderate."},
+  "chest-press":{n:"Chest Press",area:"Machines",lvl:1,mu:["Chest","Shoulders","Triceps"],
+    setup:["Adjust the seat so the handles line up with the middle of your chest.","Set the pin to a light weight."],
+    doit:["Push the handles straight out.","Bring them back slowly, about 2 seconds.","Keep your back against the pad."],
+    breathe:"Breathe out as you push.",feel:"Working across your chest and the backs of your arms.",
+    mistake:"Letting the weight stack slam down between reps.",start:"2 sets of 10, light weight."},
+  "lat-pulldown":{n:"Lat Pulldown",area:"Machines",lvl:2,mu:["Lats","Biceps","Upper back"],
+    setup:["Adjust the knee pad so your legs are snug underneath.","Grab the bar a little wider than your shoulders."],
+    doit:["Lean back slightly and pull the bar to your upper chest.","Squeeze your elbows down toward your back pockets.","Let the bar rise slowly until your arms are straight."],
+    breathe:"Breathe out as you pull down.",feel:"A squeeze along your sides, under your armpits.",
+    mistake:"Pulling the bar behind your neck. Always pull to the front.",start:"2 sets of 10, light weight."},
+  "cable-row":{n:"Seated Cable Row",area:"Cables",lvl:2,mu:["Upper back","Biceps","Rear shoulders"],
+    setup:["Sit on the bench with feet on the foot plates and knees slightly bent.","Grab the handle with both hands."],
+    doit:["Sit tall and pull the handle to your belly button.","Squeeze your shoulder blades together.","Return slowly until your arms are straight."],
+    breathe:"Breathe out as you pull.",feel:"Your shoulder blades squeezing together.",
+    mistake:"Rocking your whole body back and forth. Keep your torso still.",start:"2 sets of 10, light weight."},
+  "dumbbells":{n:"Dumbbells",area:"Free weights",lvl:2,mu:["Full body"],
+    setup:["Pick weights from the rack and step back so others can reach it.","Start lighter than you think. You can always go up."],
+    doit:["Move slowly and with control.","Finish your set, then put weights back where you found them."],
+    breathe:"Breathe out on the hard part of each rep.",feel:"Controlled and steady. Never swinging.",
+    mistake:"Dropping dumbbells or leaving them on the floor.",start:"10 to 15 lb for most exercises."},
+};
+const MICON = { "Cardio area":ICON.run, "Machines":ICON.machine, "Cables":ICON.bolt, "Free weights":ICON.machine };
+
+const TIPS = [
+  "Most people at the Rec are students just like you. Plenty of them are beginners too.",
+  "If a machine is taken, ask \"How many sets do you have left?\" Everyone does it.",
+  "Headphones are the gym's do-not-disturb sign. Wear them if you want your own space.",
+  "Rest 60 to 90 seconds between sets. Use the rest timer inside your workout.",
+  "Eat a small snack 1 to 2 hours before. A banana or granola bar is plenty.",
+  "Two short workouts a week is a real start. Showing up beats going hard.",
+  "Soreness a day or two later is normal. An easy walk helps it fade.",
+  "Running shoes work for everything at the Rec. No special gear needed.",
+  "Fill your water bottle before you start so you don't have to leave mid-workout.",
+  "Can't decide where to start? The bike is the easiest machine in the building.",
+];
+const ETIQUETTE = [
+  ["Wipe it down","Spray and wipe any bench or machine after you use it."],
+  ["Put it back","Return dumbbells and plates to where you found them."],
+  ["Ask to share","\"Can I work in?\" means taking turns between sets. It's normal."],
+  ["Give space","Don't stand right in front of the dumbbell rack or mirror."],
+  ["Phones down","Quick texts are fine. Long calls go outside the weight room."],
+];
+const GLOSSARY = [
+  ["Rep","One full movement, like pushing the leg press out and back once."],
+  ["Set","A group of reps in a row. \"2 sets of 10\" means 10 reps, rest, then 10 more."],
+  ["Rest","The break between sets. Usually 60 to 90 seconds."],
+  ["Warm-up","5 to 10 minutes of easy movement to get your body ready."],
+  ["Form","How you do the movement. Good form matters more than heavy weight."],
+  ["Work in","Taking turns on a machine with someone between sets."],
+  ["Spotter","Someone who stands by to help if you can't finish a lift."],
+  ["PR","Personal record. Your best ever, like your heaviest leg press."],
+];
+const PHASES = [
+  ["Learn","Light weights. Focus on how each move feels."],
+  ["Rhythm","Same workouts. Show up on the same days."],
+  ["Build","Add a little weight or time if it felt easy."],
+  ["Own it","Try a class or the climbing wall."],
+];
+const LEVELS = [[0,"Cub"],[300,"Prowler"],[700,"Climber"],[1200,"Peak"],[2000,"Mountain Lion"]];
+
+// ---------- plan helpers ----------
+function comfort(){ return COMFORT.find(c=>c.id===(S.profile?.comfort||"new")); }
+function goalObj(){ return GOALS.find(x=>x.id===(S.profile?.goal||"start")); }
+function planList(){ const p=S.profile||{goal:"start",days:3}; const w=W[p.goal]; return Array.from({length:p.days},(_,i)=>w[i % w.length]); }
+function exAmt(e){
+  const c=comfort();
+  if(e.t){ const m = e.fixed ? e.t : Math.round(e.t*c.f); return `${m} min`; }
+  const s=Math.max(1,e.s+c.ds); return `${s} × ${e.r}`;
+}
+function minutes(wk){ const c=comfort(); return Math.round(wk.ex.reduce((a,e)=> a + (e.t ? (e.fixed?e.t:e.t*c.f) : Math.max(1,e.s+c.ds)*2), 0)); }
+function nextIndex(){ return Math.min(thisWeek().length, planList().length-1); }
+function exMuscles(e){ return e.mu || (e.m ? MACHINES[e.m].mu : []); }
+function weekNum(){ const st=S.profile?.since; if(!st) return 1; const days=Math.floor((Date.now()-new Date(st+"T00:00").getTime())/864e5); return Math.max(1,Math.floor(days/7)+1); }
+
+// ---------- points, levels, badges ----------
+function wkManual(){ return S.manual[weekKey()] || (S.manual[weekKey()]={}); }
+function manualCount(){ return Object.values(S.manual).reduce((a,m)=>a+Object.values(m).filter(Boolean).length,0); }
+function points(){ return S.log.length*100 + manualCount()*50; }
+function lvlInfo(){
+  const p=points(); let i=0; for(let k=0;k<LEVELS.length;k++) if(p>=LEVELS[k][0]) i=k;
+  const next=LEVELS[i+1]; const pct = next ? (p-LEVELS[i][0])/(next[0]-LEVELS[i][0]) : 1;
+  return {p, i, name:LEVELS[i][1], next, pct};
+}
+function weekStreak(){
+  const set=new Set(S.log.map(l=>weekKey(new Date(l.d+"T12:00"))));
+  let n=0; const d=new Date(); if(!set.has(weekKey(d))) d.setDate(d.getDate()-7);
+  while(set.has(weekKey(d))){ n++; d.setDate(d.getDate()-7); }
+  return n;
+}
+function hitWeekEver(){ const by={}; S.log.forEach(l=>{const k=weekKey(new Date(l.d+"T12:00")); by[k]=(by[k]||0)+1;}); return Object.values(by).some(v=>v>=(S.profile?.days||3)); }
+function badges(){
+  const total=S.log.length, ever = id => Object.values(S.manual).some(m=>m[id]);
+  return [
+    {n:"First Rep",l:"Finish your first workout",on:total>=1,m:"1",a:"cardio"},
+    {n:"Five Up",l:"5 workouts done",on:total>=5,m:"5",a:"machine"},
+    {n:"Ten Strong",l:"10 workouts done",on:total>=10,m:"10",a:"free"},
+    {n:"Full Week",l:"Hit your weekly goal",on:hitWeekEver(),m:"W",a:"cable"},
+    {n:"Buddy Up",l:"Bring a friend",on:ever("buddy"),m:"2",a:"stretch"},
+    {n:"Explorer",l:"Try the climbing wall or a class",on:ever("class")||ever("climb"),m:"X",a:"other"},
+  ];
+}
+
+// ---------- rendering helpers ----------
+const $app=document.getElementById("app"), $tabs=document.getElementById("tabs");
+function topBar(){
+  const L=lvlInfo();
+  return `<div class="top"><div class="brand"><span class="brand-mark" aria-hidden="true">1</span>First Rep</div>
+    <div class="top-right">${S.profile?`<button class="lvl-chip" data-go="challenges" aria-label="${L.name}, ${L.p} points"><i>${L.i+1}</i>${L.p} pts</button>`:""}
+    <button class="circle-btn" data-go="help" aria-label="Help">${ICON.help}</button></div></div>`;
+}
+function backBar(to,label="Back"){ return `<div class="top"><button class="back" data-go="${to}">${ICON.back}${label}</button></div>`; }
+const foot = `<p class="foot">A student project for UCCS students. Not an official UCCS app.<br>Rec hours from <a href="${REC}" target="_blank" rel="noopener">campusrec.uccs.edu</a> (Fall 2026). Crowd levels are sample estimates.</p>`;
+const chip = w => `<span class="chip a-${areaOf(w)}">${w}</span>`;
+
+function weekStrip(){
+  const mon=new Date(weekKey()+"T12:00"), today=iso(new Date()), logged=new Set(S.log.map(l=>l.d));
+  return `<div class="week">${["M","T","W","T","F","S","S"].map((L,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); const k=iso(d);
+    return `<div class="wd ${logged.has(k)?"on":""} ${k===today?"today":""}"><i>${logged.has(k)?ICON.tick:""}</i>${L}</div>`; }).join("")}</div>`;
+}
+
+function busyCard(){
+  const now=new Date(), d=now.getDay(), h=now.getHours(), [o,c]=HOURS[d];
+  const v=busyFor(d,h), [cls,txt]=level(v);
+  const bars=[]; for(let x=o;x<c;x++){ const b=busyFor(d,x); const q=b<45?"q":b<70?"m":"b"; bars.push(`<i class="${q} ${x===h?"now":""}" style="height:${Math.max(8,b)}%" title="${fmtH(x)}"></i>`); }
+  let quiet=null; for(let x=Math.max(h+1,o);x<c;x++){ if(busyFor(d,x)<45){quiet=x;break;} }
+  const tip = v===null ? `Opens ${h<o?`today at ${fmtH(o)}`:"tomorrow"}.` : (cls==="quiet" ? "Great time to go." : quiet ? `Quieter around ${fmtH(quiet)}.` : "Try earlier in the day tomorrow.");
+  return `<div class="card stack">
+    <div class="row between"><h3>Rec right now</h3><span class="pill ${cls}">${txt}</span></div>
+    <div><div class="meter" aria-hidden="true">${bars.join("")}</div>
+    <div class="meter-axis"><span>${fmtH(o)}</span><span>${fmtH(Math.round((o+c)/2))}</span><span>${fmtH(c)}</span></div></div>
+    <p class="small muted"><b style="color:var(--ink)">${tip}</b> Open ${fmtH(o)} – ${fmtH(c)} today.</p>
+  </div>`;
+}
+
+const V = {};
+
+V.start = () => {
+  const step = V._step||0, p = V._draft || (V._draft = {});
+  if(step===0) return `<div class="splash fade">${topBar()}
+    <div class="splash-hero">
+      <span class="eyebrow">For UCCS students</span>
+      <h1>Feeling lost in the <em>gym?</em></h1>
+      <p>Answer 3 quick questions and get a short workout plan made just for you. No account. No download.</p>
+    </div>
+    <ul class="promise">
+      <li>${ICON.calendar}<span>A plan that fits your week</span></li>
+      <li>${ICON.machine}<span>How to use every machine</span></li>
+      <li>${ICON.clock}<span>When the Rec is quiet</span></li>
+    </ul>
+    <div class="stack">
+      <button class="btn btn-gold" data-act="ob-next">Build my plan</button>
+      <button class="btn btn-ghost" data-act="ob-skip">Just look around</button>
+    </div>${foot}</div>`;
+  const qs = [
+    {q:"What's your main goal?", key:"goal", opts:GOALS.map(g=>({v:g.id,a:g.a,ic:g.ic,t:g.t,s:g.s}))},
+    {q:"How comfortable are you at the gym?", key:"comfort", opts:COMFORT.map((c,i)=>({v:c.id,a:["stretch","machine","cable"][i],txt:c.ic,t:c.t,s:c.s}))},
+    {q:"How many days a week can you go?", key:"days", opts:DAYS.map((d,i)=>({v:d.id,a:["free","cardio","machine"][i],txt:String(d.id),t:d.t,s:d.s}))},
+  ];
+  const Q = qs[step-1];
+  return `<div class="ob fade">
+    <div class="row between"><button class="back" data-act="ob-back">${ICON.back}Back</button><span class="small muted"><b>${step}</b> of 3</span></div>
+    <div class="steps">${[1,2,3].map(i=>`<i class="${i<=step?"on":""}"></i>`).join("")}</div>
+    <h1>${Q.q}</h1>
+    <div class="choices">${Q.opts.map(o=>`<button class="choice a-${o.a}" aria-pressed="${p[Q.key]==o.v}" data-act="ob-pick" data-k="${Q.key}" data-v="${o.v}"><span class="ic ${o.txt?"txt":""}">${o.txt||o.ic}</span><span><b>${o.t}</b><span>${o.s}</span></span></button>`).join("")}</div>
+  </div>`;
+};
+
+V.home = () => {
+  const list=planList(), i=nextIndex(), wk=list[i], done=thisWeek().length, goal=list.length, finished=done>=goal;
+  const hr=new Date().getHours(), greet=hr<12?"Good morning":hr<17?"Good afternoon":"Good evening";
+  const mins=thisWeek().reduce((a,l)=>a+(l.min||0),0);
+  const areas=[...new Set(wk.ex.map(e=>e.w))].slice(0,3);
+  const tip=TIPS[Math.floor(Date.now()/864e5)%TIPS.length];
+  return `<div class="stack-lg fade">${topBar()}
+    <div class="stack" style="gap:6px"><span class="eyebrow">${greet}</span><h1 style="font-size:2.2rem">${finished?"Week crushed.":"Let's get one <span class=\"hl\">rep</span> closer."}</h1></div>
+    <div class="hero">
+      <span class="eyebrow">${finished?"Weekly goal reached":`Workout ${i+1} of ${goal} this week`}</span>
+      <h2>${finished?"Bonus round?":wk.n}</h2>
+      <div class="meta"><span><b>${minutes(wk)}</b> min</span><span><b>${wk.ex.length}</b> steps</span><span>Goal: <b>${goalObj().t}</b></span></div>
+      <div class="hero-chips">${areas.map(chip).join("")}</div>
+      <div class="bar" aria-label="${done} of ${goal} workouts done"><i style="width:${Math.min(100,done/goal*100)}%"></i></div>
+      <button class="btn btn-gold" data-go="workout">${finished?"Do a bonus workout":"Start workout"}</button>
+    </div>
+    ${weekStrip()}
+    <div class="stats">
+      <div class="stat c1"><b>${weekStreak()}</b><span>week streak</span></div>
+      <div class="stat c2"><b>${mins}</b><span>minutes this week</span></div>
+      <div class="stat c3"><b>${S.log.length}</b><span>total workouts</span></div>
+    </div>
+    ${busyCard()}
+    <div class="tiles">
+      <button class="tile t-machine" data-go="machines">${ICON.machine}<b>Machine guides</b><span>How to use each one, step by step</span></button>
+      <button class="tile t-cardio" data-go="visit">${ICON.map}<b>First visit</b><span>What to bring, where to go, the unwritten rules</span></button>
+      <button class="tile t-free" data-go="explore">${ICON.star}<b>More than weights</b><span>Classes, climbing wall, intramurals</span></button>
+      <button class="tile t-cable" data-go="buddy">${ICON.friend}<b>Bring a friend</b><span>Send a plan to someone</span></button>
+    </div>
+    <div class="tip"><span class="bulb">${ICON.bulb}</span><span class="small"><b>Tip of the day</b>${tip}</span></div>
+    ${foot}</div>`;
+};
+
+V.plan = () => {
+  const list=planList(), done=thisWeek().length, p=S.profile, c=comfort(), g=goalObj(), wn=weekNum();
+  const ph=Math.min(wn,4)-1;
+  return `<div class="stack-lg fade">${topBar()}
+    <div class="stack"><span class="eyebrow">My plan · Week ${wn}</span><h1>${g.t}</h1>
+    <p class="muted">${p?p.days:3} workouts a week · ${c.t.toLowerCase()} level</p></div>
+    <div class="stack"><h3>Your first month</h3>
+      <div class="phases">${PHASES.map((x,k)=>`<div class="ph ${k<ph?"past":k===ph?"cur":""}"><span class="small" style="font-size:.68rem;font-weight:700">WEEK ${k+1}</span><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")}</div></div>
+    <div class="stack"><h3>This week</h3>
+    <div class="list">${list.map((wk,k)=>`<button class="li" data-act="open-wk" data-i="${k}">
+      <span class="badge-day ${k<done?"done":k===done?"next":""}">${k<done?ICON.tick:wk.k}</span>
+      <span class="grow"><b>${wk.n}</b><div class="sub">${minutes(wk)} min · ${[...new Set(wk.ex.flatMap(exMuscles))].filter(m=>m!=="Heart"&&m!=="Mind").slice(0,3).join(", ")||"Full body"}</div></span>${ICON.chev}</button>`).join("")}</div></div>
+    <div class="callout gold"><b>Why so short?</b><span class="small">Short workouts you actually finish beat long ones you dread. Tell the app a workout felt too easy and the next ones grow.</span></div>
+    <button class="btn btn-ghost" data-act="redo">Change my answers</button>
+    ${foot}</div>`;
+};
+
+V.workout = () => {
+  const list=planList(); const i = V._wk ?? nextIndex(); const wk=list[i];
+  const ck = S.pack.ck || [];
+  const n = wk.ex.filter((_,k)=>ck[k]).length, all = n===wk.ex.length;
+  return `<div class="stack-lg fade">${backBar("home")}
+    <div class="stack"><span class="eyebrow">${wk.n} · ${minutes(wk)} min</span><h1>Let's <span class="hl">go</span></h1>
+    <div class="row"><div class="bar" style="flex:1"><i style="width:${n/wk.ex.length*100}%"></i></div><b class="small">${n}/${wk.ex.length}</b></div>
+    <p class="muted small">Tap the circle when you finish each step. Use the rest timer between sets.</p></div>
+    <div class="list">${wk.ex.map((e,k)=>{ const a=areaOf(e.w); return `<div class="ex a-${a}">
+      <button class="check ${ck[k]?"on":""}" aria-label="Mark ${e.n} done" aria-pressed="${!!ck[k]}" data-act="tick" data-k="${k}">${ICON.tick}</button>
+      <div class="grow"><span class="name ${ck[k]?"done":""}">${e.n}</span>
+        <div class="row" style="gap:8px;flex-wrap:wrap"><span class="amt">${exAmt(e)}</span>${chip(e.w)}</div>
+        <span class="how">${e.h}</span>
+        <div class="row" style="gap:6px;flex-wrap:wrap">${exMuscles(e).map(m=>`<span class="mchip">${m}</span>`).join("")}</div>
+        <div class="ex-actions">
+          ${e.s?`<button class="mini" data-act="rest" data-sec="60" data-label="${e.n}">${ICON.timer}Rest 60s</button>`:""}
+          ${e.m?`<button class="mini" data-go="machine-${e.m}">How to use</button>`:""}
+          ${e.cls?`<a class="mini" href="${REC}/fitness" target="_blank" rel="noopener">Class schedule</a>`:""}
+        </div></div></div>`;}).join("")}</div>
+    <button class="btn ${all?"btn-gold":"btn-dark"}" data-act="finish">${all?"Finish workout · +100 pts":"I'm done for today · +100 pts"}</button>
+    </div>`;
+};
+
+V.done = () => {
+  const n=thisWeek().length, goal=planList().length, newB=V._newBadge, L=lvlInfo();
+  return `<div class="stack-lg fade" style="padding-top:16px">
+    <div class="done-hero pop">
+      <span class="eyebrow">Workout logged</span>
+      <div class="big-num">${n}/${goal}</div>
+      <h1>${n>=goal?"Weekly goal done!":"You showed up. That's the hard part."}</h1>
+      <span class="pts-pill">+100 Pride points</span>
+    </div>
+    <div class="card stack"><div class="row between"><b>${L.name}</b><span class="small muted">${L.next?`${L.next[0]-L.p} pts to ${L.next[1]}`:"Top level"}</span></div><div class="bar"><i style="width:${L.pct*100}%"></i></div></div>
+    ${newB?`<div class="callout gold"><b>New badge: ${newB}</b><span class="small">See it on the Challenges tab.</span></div>`:""}
+    <div class="stack"><h3>How did that feel?</h3>
+      <div class="choices">
+        <button class="choice a-cardio" data-act="rate" data-v="-1"><span class="ic txt">−</span><span><b>Too hard</b><span>Make the next ones shorter</span></span></button>
+        <button class="choice a-free" data-act="rate" data-v="0"><span class="ic txt">=</span><span><b>Just right</b><span>Keep it like this</span></span></button>
+        <button class="choice a-machine" data-act="rate" data-v="1"><span class="ic txt">+</span><span><b>Too easy</b><span>Add a bit more next time</span></span></button>
+      </div></div>
+    <p class="small muted">Sore tomorrow? That's normal after a new workout. <a href="#sore" data-go="sore">What to do about it</a>.</p>
+  </div>`;
+};
+
+V.machines = () => `<div class="stack-lg fade">${topBar()}
+  <div class="stack"><span class="eyebrow">Machine guides</span><h1>How do I use <span class="hl">this?</span></h1>
+  <p class="muted">Scan the sticker on a machine at the Rec, or pick it here.</p></div>
+  ${["Cardio area","Machines","Cables","Free weights"].map(a=>{
+    const ms=Object.entries(MACHINES).filter(([,m])=>m.area===a); if(!ms.length) return "";
+    const ar=areaOf(a);
+    return `<div class="stack"><div class="row" style="gap:8px">${chip(a)}<span class="small muted">${ms.length} guide${ms.length>1?"s":""}</span></div><div class="list">${ms.map(([id,m])=>`<button class="li a-${ar}" data-go="machine-${id}"><span class="mico">${MICON[a]}</span><span class="grow"><b>${m.n}</b><div class="sub">${m.mu.join(" · ")}</div></span>${ICON.chev}</button>`).join("")}</div></div>`;}).join("")}
+  ${foot}</div>`;
+
+V.machine = id => {
+  const m=MACHINES[id]; if(!m) return V.machines();
+  const fresh = !S.profile, a=areaOf(m.area);
+  return `<div class="stack-lg fade a-${a}">${backBar(fresh?"start":"machines", fresh?"First Rep":"All machines")}
+    <div class="mhead">
+      <span class="eyebrow">${m.area}</span><h1>${m.n}</h1>
+      <div class="row" style="gap:6px;flex-wrap:wrap">${m.mu.map(x=>`<span class="mchip">${x}</span>`).join("")}</div>
+      <span class="lvl-dots">${[1,2,3].map(k=>`<i class="${k<=m.lvl?"on":""}"></i>`).join("")}&nbsp;${["","Beginner friendly","Easy to learn","Takes practice"][m.lvl]}</span>
+    </div>
+    <div class="video"><span><span class="play">${ICON.play}</span><b>30-second demo</b>Filmed with Rec staff. Coming soon.</span></div>
+    <div class="card stack" style="--a-fg:var(--on-color)"><h3>Set up</h3><ol class="num">${m.setup.map(s=>`<li>${s}</li>`).join("")}</ol></div>
+    <div class="card stack" style="--a-fg:var(--on-color)"><h3>Do it</h3><ol class="num">${m.doit.map(s=>`<li>${s}</li>`).join("")}</ol></div>
+    <div class="cue-grid"><div class="cue"><b>Breathing</b>${m.breathe}</div><div class="cue"><b>Should feel</b>${m.feel}</div></div>
+    <div class="callout"><b>Common mistake</b><span class="small">${m.mistake}</span></div>
+    <div class="callout gold"><b>Start here</b><span class="small">${m.start}</span></div>
+    <p class="small muted">Still unsure? Ask any Rec staff member. Helping is their job, and everybody asks.</p>
+    ${fresh?`<button class="btn btn-gold" data-go="start">Get a plan in 3 taps</button>`:""}
+    ${foot}</div>`;
+};
+
+V.challenges = () => {
+  const n=thisWeek().length, goal=planList().length, m=wkManual(), L=lvlInfo();
+  const ch=[
+    {id:"auto",t:`Show up ${goal} times`,s:"Finish your weekly workouts",p:Math.min(1,n/goal),auto:true,lbl:`${Math.min(n,goal)}/${goal}`},
+    {id:"buddy",t:"Bring a friend",s:"Work out with someone this week"},
+    {id:"quiet",t:"Beat the crowd",s:"Go during a quiet hour"},
+    {id:"class",t:"Try a group class",s:"Cycle, dance, strength or mind/body"},
+    {id:"climb",t:"Try the SOLE Climbing Wall",s:"Gear is provided"},
+  ];
+  return `<div class="stack-lg fade">${topBar()}
+    <div class="lvl-card">
+      <span class="eyebrow">Your level</span>
+      <div class="row between" style="align-items:flex-end"><span class="big">${L.name}</span><b style="font-size:1.1rem">${L.p} pts</b></div>
+      <div class="bar"><i style="width:${L.pct*100}%"></i></div>
+      <span class="small">${L.next?`${L.next[0]-L.p} points to ${L.next[1]}. Workouts are 100, challenges are 50.`:"You reached the top. Legend."}</span>
+    </div>
+    <div class="stack"><div class="row between"><h2>This week</h2><span class="small muted">Resets Monday</span></div>
+    <div class="list">${ch.map(c=>`<div class="chal"><div class="grow"><b>${c.t}</b><div class="small muted">${c.s}</div>
+      ${c.auto?`<div class="bar" style="margin-top:8px"><i style="width:${c.p*100}%"></i></div>`:`<span class="pts">+50 pts</span>`}</div>
+      ${c.auto?`<span class="chip a-other">${c.lbl}</span>`:`<button class="mini ${m[c.id]?"done":""}" data-act="chal" data-id="${c.id}" aria-pressed="${!!m[c.id]}">${m[c.id]?"Done":"Mark done"}</button>`}</div>`).join("")}</div></div>
+    <div class="stack"><h2>Badges</h2><div class="badges">${badges().map(b=>`<div class="bdg a-${b.a} ${b.on?"on":""}"><span class="medal">${b.m}</span><b>${b.n}</b><span class="muted">${b.l}</span></div>`).join("")}</div></div>
+    ${foot}</div>`;
+};
+
+V.visit = () => {
+  const d=new Date().getDay(), ck=S.pack;
+  const items=["Student ID (for check-in)","Water bottle","Sneakers","Small towel","Lock for a locker","Headphones"];
+  const got=items.filter((_,k)=>ck["p"+k]).length;
+  const order=[1,2,3,4,5,6,0];
+  return `<div class="stack-lg fade">${backBar("home")}
+    <div class="stack"><span class="eyebrow">Your first visit</span><h1>What to <span class="hl">expect</span></h1>
+    <p class="muted">Everyone has a first day. Here's exactly how it goes.</p></div>
+    <div class="stack"><div class="row between"><h3>Pack your bag</h3><span class="chip a-free">${got}/${items.length} packed</span></div>
+      <div class="list">${items.map((t,k)=>`<button class="li a-free" data-act="pack" data-k="${k}"><span class="check ${ck["p"+k]?"on":""}">${ICON.tick}</span><span class="grow">${t}</span></button>`).join("")}</div></div>
+    <div class="card stack a-machine" style="--a-fg:var(--on-color)"><h3>When you get there</h3><ol class="num">
+      <li>Scan your student ID at the front desk.</li>
+      <li>Drop your bag in the locker room.</li>
+      <li>Head to the cardio area and warm up for 5 minutes.</li>
+      <li>Open today's workout in this app and follow along.</li>
+      <li>Wipe down equipment when you're done.</li></ol></div>
+    <div class="stack"><h3>The unwritten rules</h3>
+      <div class="list">${ETIQUETTE.map(([t,s],k)=>`<div class="li a-${["cardio","machine","cable","free","stretch"][k]}" style="cursor:default"><span class="mico" style="width:36px;height:36px;font:800 1rem var(--display)">${k+1}</span><span class="grow"><b>${t}</b><div class="sub">${s}</div></span></div>`).join("")}</div></div>
+    <div class="callout gold"><b>Nobody is watching you</b><span class="small">Most people are focused on their own workout and their own playlist. Go during a quiet hour if you want extra space.</span></div>
+    <div class="card stack"><h3>Rec Center hours</h3>
+      <table class="hours">${order.map(k=>`<tr class="${k===d?"today":""}"><td>${DAYNAMES[k]}</td><td>${fmtH(HOURS[k][0])} – ${fmtH(HOURS[k][1])}</td></tr>`).join("")}</table>
+      <p class="small muted">Fall 2026 hours. Check <a href="${REC}/campus-rec" target="_blank" rel="noopener">campusrec.uccs.edu</a> or @UCCSRec on Instagram for breaks and closures.</p></div>
+    ${foot}</div>`;
+};
+
+V.explore = () => {
+  const opts=[
+    {a:"cardio",t:"Group fitness classes",g:"Good if you like being told what to do next",s:"Cardio, cycle, dance, martial arts, mind/body and strength classes.",u:`${REC}/fitness`},
+    {a:"machine",t:"SOLE Climbing Wall",g:"Good if the weight room bores you",s:"Monday to Friday, 12 pm to 9 pm. $15 per term, and all gear is provided.",u:`${REC}/sole/climbing-wall`},
+    {a:"stretch",t:"Aquatic Center",g:"Good if you like low-impact workouts",s:"Lap pool and leisure pool. Currently closed for HVAC repairs, so check the Rec site before you go.",u:`${REC}/facilities/recreation-center`},
+    {a:"cable",t:"Intramurals + outdoor trips",g:"Good if you like a team",s:"Team sports and outdoor adventures with other students. Active without the weight room.",u:`${REC}/campus-rec`},
+  ];
+  return `<div class="stack-lg fade">${backBar("home")}
+    <div class="stack"><span class="eyebrow">More than weights</span><h1>Find what you <span class="hl">like</span></h1>
+    <p class="muted">The weight room isn't for everyone. All of these count.</p></div>
+    ${opts.map(o=>`<a class="xcard a-${o.a}" href="${o.u}" target="_blank" rel="noopener"><span class="good">${o.g}</span><h3>${o.t}</h3><p>${o.s}</p><span class="go">Learn more →</span></a>`).join("")}
+    ${foot}</div>`;
+};
+
+function inviteText(){
+  return `Want to hit the Rec with me this week? I'm using First Rep to ${goalObj().t.toLowerCase()}. It makes you a short plan in 3 taps. ${APP_URL}`;
+}
+V.buddy = () => `<div class="stack-lg fade">${backBar("home")}
+  <div class="stack"><span class="eyebrow">Bring a friend</span><h1>Better <span class="hl">together</span></h1>
+  <p class="muted">It's easier to show up when someone is expecting you. Send this to a friend.</p></div>
+  <label class="stack" for="invite"><b>Your invite</b><textarea class="invite" id="invite">${inviteText()}</textarea></label>
+  <button class="btn btn-gold" data-act="copy">Copy invite</button>
+  <div class="callout gold"><b>Bonus</b><span class="small">Mark "Bring a friend" done on the Challenges tab for +50 points.</span></div>
+  <div class="card stack"><h3>No friend free? Ask the Rec</h3>
+  <p class="small muted">Rec staff can show you around and answer questions. Personal training is also available through the Rec's fitness program.</p>
+  <a class="btn btn-ghost" href="${REC}/fitness" target="_blank" rel="noopener">See fitness options</a></div>
+  ${foot}</div>`;
+
+V.sore = () => `<div class="stack-lg fade">${backBar(S.profile?"home":"start")}
+  <div class="stack"><span class="eyebrow">Recovery</span><h1>Sore? That's <span class="hl">normal.</span></h1>
+  <p class="muted">Muscle soreness usually shows up a day or two after a new workout, then fades. It means your body is adapting.</p></div>
+  <div class="card stack a-stretch" style="--a-fg:var(--on-color)"><h3>What helps</h3><ol class="num">
+    <li>Keep moving. A 10 to 15 minute easy walk or bike ride helps more than lying still.</li>
+    <li>Stretch gently, 20 to 30 seconds per muscle.</li>
+    <li>Drink water and get a full night of sleep.</li>
+    <li>Do the next workout a little lighter if you're still sore.</li></ol></div>
+  <div class="callout"><b>When to get checked</b><span class="small">Sharp pain, swelling, or pain that gets worse instead of better is not normal soreness. Stop and talk to a health professional.</span></div>
+  ${foot}</div>`;
+
+V.help = () => `<div class="stack-lg fade">${backBar("home")}
+  <div class="stack"><span class="eyebrow">Help</span><h1>We've got <span class="hl">you</span></h1></div>
+  <div class="list">
+    <button class="li a-cardio" data-go="visit"><span class="mico">${ICON.map}</span><span class="grow"><b>First visit guide</b><div class="sub">What to bring, where to go, hours</div></span>${ICON.chev}</button>
+    <button class="li a-machine" data-go="machines"><span class="mico">${ICON.machine}</span><span class="grow"><b>How do I use a machine?</b><div class="sub">Step-by-step guides</div></span>${ICON.chev}</button>
+    <button class="li a-stretch" data-go="sore"><span class="mico">${ICON.heart}</span><span class="grow"><b>I'm really sore</b><div class="sub">What's normal and what helps</div></span>${ICON.chev}</button>
+    <button class="li a-cable" data-go="buddy"><span class="mico">${ICON.friend}</span><span class="grow"><b>I don't want to go alone</b><div class="sub">Invite a friend or ask staff</div></span>${ICON.chev}</button>
+    <a class="li a-free" href="${REC}/campus-rec" target="_blank" rel="noopener"><span class="mico">${ICON.star}</span><span class="grow"><b>UCCS Campus Rec website</b><div class="sub">Hours, memberships, closures</div></span>${ICON.chev}</a>
+  </div>
+  <div class="stack"><h3>Gym words, explained</h3><div class="list">${GLOSSARY.map(([t,s])=>`<details><summary>${t}</summary><p>${s}</p></details>`).join("")}</div></div>
+  <button class="btn btn-ghost" data-act="reset">Reset this app on my phone</button>
+  <p class="small muted" id="reset-note" hidden>Tap again to erase your plan and progress on this device.</p>
+  ${foot}</div>`;
+
+// ---------- rest timer ----------
+const $timer=document.getElementById("timer"); let T=null;
+function startTimer(sec,label){
+  clearInterval(T?.iv); T={end:Date.now()+sec*1000,total:sec,label};
+  $timer.hidden=false; $timer.classList.remove("done"); T.iv=setInterval(drawTimer,250); drawTimer();
+}
+function drawTimer(){
+  if(!T) return; const left=Math.max(0,Math.ceil((T.end-Date.now())/1000));
+  const fin=left===0; if(fin){ clearInterval(T.iv); $timer.classList.add("done"); setTimeout(()=>{ if(T&&Date.now()>=T.end){ stopTimer(); } },4000); }
+  $timer.innerHTML=`<div class="timer-in"><span class="t">${fin?"GO":`${Math.floor(left/60)}:${pad(left%60)}`}</span>
+    <div class="grow"><b>${fin?"Rest done. Next set!":"Resting"}</b><span style="opacity:.75">${T.label}</span><div class="bar"><i style="width:${(1-left/T.total)*100}%"></i></div></div>
+    ${fin?"":`<button data-act="t-add">+15s</button>`}<button data-act="t-stop">${fin?"Close":"Skip"}</button></div>`;
+}
+function stopTimer(){ if(T) clearInterval(T.iv); T=null; $timer.hidden=true; }
+
+// ---------- confetti ----------
+function confetti(){
+  if(reduceMotion()) return;
+  const c=document.createElement("canvas"); c.id="confetti"; document.body.appendChild(c);
+  const ctx=c.getContext && c.getContext("2d"); if(!ctx){ c.remove(); return; }
+  const W_=c.width=innerWidth*devicePixelRatio, H_=c.height=innerHeight*devicePixelRatio;
+  const cs=getComputedStyle(document.documentElement), cols=["--gold","--cardio","--machine","--free","--cable","--stretch"].map(v=>cs.getPropertyValue(v).trim()||"#FFC72C");
+  const P=Array.from({length:140},()=>({x:W_/2+(Math.random()-.5)*W_*.3,y:H_*.35,vx:(Math.random()-.5)*26*devicePixelRatio,vy:(-Math.random()*22-8)*devicePixelRatio,s:(6+Math.random()*7)*devicePixelRatio,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[Math.floor(Math.random()*cols.length)]}));
+  const t0=performance.now();
+  (function frame(t){ ctx.clearRect(0,0,W_,H_); P.forEach(p=>{ p.vy+=.7*devicePixelRatio; p.vx*=.985; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); ctx.restore(); });
+    if(t-t0<2200) requestAnimationFrame(frame); else c.remove(); })(t0);
+}
+
+// ---------- router ----------
+const TABS={home:"home",plan:"plan",machines:"machines",challenges:"challenges"};
+function route(){
+  let h=(location.hash||"").slice(1);
+  if(!S.profile && !h) h="start";
+  if(!S.profile && ["home","plan","workout","challenges","done"].includes(h)) h="start";
+  let html;
+  if(h.startsWith("machine-")) html=V.machine(h.slice(8));
+  else if(V[h] && !h.startsWith("_")) html=V[h]();
+  else html=V.home();
+  const noTabs = !S.profile || ["start","done","workout"].includes(h);
+  $tabs.hidden=noTabs; $app.classList.toggle("no-tabs",noTabs);
+  $app.innerHTML=html;
+  const t = h.startsWith("machine-") ? "machines" : (TABS[h]||(h===""?"home":""));
+  document.querySelectorAll(".tab").forEach(b=>b.removeAttribute("aria-current"));
+  if(t) document.querySelector(`.tab[data-go="${t}"]`)?.setAttribute("aria-current","page");
+  if(h!=="workout") stopTimer();
+  try{ window.scrollTo(0,0); }catch(e){}
+}
+function go(h){ if(location.hash==="#"+h) route(); else location.hash=h; }
+window.addEventListener("hashchange",route);
+
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),2200); }
+
+let resetArmed=false;
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]");
+  if(g){ e.preventDefault(); const to=g.dataset.go; if(to==="workout"){ V._wk=undefined; S.pack.ck=[]; save(); } go(to); return; }
+  const a=e.target.closest("[data-act]"); if(!a) return;
+  const act=a.dataset.act;
+  if(act==="ob-next"){ V._step=1; route(); }
+  else if(act==="ob-skip"){ S.profile={goal:"start",comfort:"new",days:3,since:iso(new Date())}; save(); go("home"); }
+  else if(act==="ob-back"){ V._step=Math.max(0,(V._step||0)-1); route(); }
+  else if(act==="ob-pick"){
+    const k=a.dataset.k, v=a.dataset.v; V._draft[k]= k==="days"? +v : v;
+    if(V._step<3){ V._step++; route(); }
+    else { S.profile={...V._draft, since:V._draft.since||iso(new Date())}; V._step=0; V._draft=null; save(); go("home"); toast("Your plan is ready"); }
+  }
+  else if(act==="redo"){ V._step=1; V._draft={...(S.profile||{})}; go("start"); }
+  else if(act==="open-wk"){ V._wk=+a.dataset.i; S.pack.ck=[]; save(); go("workout"); }
+  else if(act==="tick"){ const k=+a.dataset.k; S.pack.ck=S.pack.ck||[]; S.pack.ck[k]=!S.pack.ck[k]; save(); const y=window.scrollY; route(); try{window.scrollTo(0,y);}catch(err){} }
+  else if(act==="rest"){ startTimer(+a.dataset.sec, a.dataset.label); }
+  else if(act==="t-add"){ if(T){ T.end+=15000; T.total+=15; drawTimer(); } }
+  else if(act==="t-stop"){ stopTimer(); }
+  else if(act==="finish"){
+    const before=badges().filter(b=>b.on).map(b=>b.n);
+    const i=V._wk ?? nextIndex(), wk=planList()[i];
+    S.log.push({d:iso(new Date()), w:wk.n, min:minutes(wk)}); S.pack.ck=[]; V._wk=undefined; save();
+    const nb=badges().find(b=>b.on && !before.includes(b.n)); V._newBadge=nb?nb.n:null; go("done"); confetti();
+  }
+  else if(act==="rate"){
+    const v=+a.dataset.v, order=["new","some","comfy"], cur=order.indexOf(S.profile.comfort||"new");
+    const nx=Math.max(0,Math.min(2,cur+v)); S.profile.comfort=order[nx]; save();
+    toast(v===0?"Got it. Same next time.":nx===cur?"You're already at that level.":v>0?"Next workouts will be a bit longer.":"Next workouts will be a bit shorter.");
+    go("home");
+  }
+  else if(act==="chal"){ const m=wkManual(), id=a.dataset.id; m[id]=!m[id]; save(); route(); if(m[id]){ toast("+50 Pride points"); } }
+  else if(act==="pack"){ const k="p"+a.dataset.k; S.pack[k]=!S.pack[k]; save(); const y=window.scrollY; route(); try{window.scrollTo(0,y);}catch(err){} }
+  else if(act==="copy"){
+    const ta=document.getElementById("invite"), txt=ta.value;
+    const fallback=()=>{ ta.focus(); ta.select(); toast("Selected. Copy it from your keyboard menu."); };
+    try{ navigator.clipboard.writeText(txt).then(()=>toast("Invite copied. Paste it in a text."),fallback); }catch(err){ fallback(); }
+  }
+  else if(act==="reset"){
+    if(!resetArmed){ resetArmed=true; document.getElementById("reset-note").hidden=false; a.textContent="Yes, reset everything"; return; }
+    try{ localStorage.removeItem(KEY); }catch(err){} location.hash=""; location.reload();
+  }
+});
+
+route();
+})();
+</script>
+
+</body>
+</html>
