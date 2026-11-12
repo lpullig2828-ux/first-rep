@@ -320,6 +320,16 @@ details p{padding:0 16px 14px;color:var(--muted);font-size:.9rem}
 .pts-pill{align-self:flex-start;background:#0F1013;color:var(--gold);border-radius:999px;padding:6px 14px;font-weight:800;font-size:.9rem}
 textarea.invite{width:100%;min-height:110px;border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:.92rem;background:var(--surface);color:var(--ink);resize:vertical;box-sizing:border-box}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;height:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.daychips{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dchip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 0;font:800 .74rem var(--body);cursor:pointer;min-width:0}
+.dchip[aria-pressed="true"]{background:var(--machine);border-color:var(--machine);color:var(--on-color)}
+.sel{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:10px;padding:10px;font:500 .95rem var(--body);background:var(--surface);color:var(--ink)}
+.cal-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cal-btns .btn{font-size:.88rem;padding:13px 8px}
+.conf{border-radius:var(--r);padding:16px;background:color-mix(in srgb,var(--machine) 9%,var(--surface));border:2px solid var(--machine)}
+.conf .eyebrow{color:var(--machine)}
+.conf-opts{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -336,14 +346,36 @@ textarea.invite{width:100%;min-height:110px;border:1.5px solid var(--line);borde
 <script>
 (()=>{
 // ---------- config ----------
-const APP_URL = location.href.split("#")[0]; // the site's own address
+const APP_URL = location.origin + location.pathname; // the site's own address
 const REC = "https://campusrec.uccs.edu";
+const WELLNESS = "https://recwellness.uccs.edu";
+
+// ---------- anonymous impact counting (GoatCounter: no cookies, no names) ----------
+const GC_CODE = "firstrep-uccs"; // dashboard: https://firstrep-uccs.goatcounter.com
+const GCQ = [];
+let firstPV = true;
+function gcSend(o){ try{ if(window.goatcounter && window.goatcounter.count){ window.goatcounter.count(o); } else { GCQ.push(o); } }catch(e){} }
+function track(name){ gcSend({path:"event/"+name, title:name, event:true}); }
+function pageview(v){ gcSend(Object.assign({path:"/"+v, title:v}, firstPV && SRC ? {referrer:"qr-"+SRC} : {})); firstPV=false; }
+(function loadGC(){
+  if(!/^https?:$/.test(location.protocol) || /claude|localhost|127\.0\.0\.1/.test(location.hostname)) return;
+  window.goatcounter = { no_onload:true };
+  const s=document.createElement("script"); s.async=true; s.src="https://gc.zgo.at/count.js";
+  s.dataset.goatcounter=`https://${GC_CODE}.goatcounter.com/count`;
+  s.onload=()=>{ while(GCQ.length) gcSend(GCQ.shift()); };
+  document.head.appendChild(s);
+})();
 
 // ---------- storage (per-device) ----------
 const KEY = "firstrep.v1";
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
-const S = Object.assign({ profile:null, log:[], manual:{}, pack:{} }, load());
+const S = Object.assign({ profile:null, log:[], manual:{}, pack:{}, conf:{}, cal:false, calHide:false, src:"" }, load());
+const QS = new URLSearchParams(location.search);
+const SRC = (QS.get("utm_source")||QS.get("src")||"").toLowerCase().replace(/[^a-z0-9-]/g,"").slice(0,40);
+if(SRC && !S.src){ S.src=SRC; save(); }
+if(SRC) track("scan/"+SRC);
+const srcTag = () => S.src || "direct";
 
 // ---------- dates ----------
 const pad = n => String(n).padStart(2,"0");
@@ -398,6 +430,14 @@ const COMFORT = [
   {id:"comfy",ic:"2", t:"Pretty comfortable",s:"Give me a bit more",        f:1.7, ds:1},
 ];
 const DAYS = [{id:2,t:"2 days a week",s:"A solid start"},{id:3,t:"3 days a week",s:"Most popular"},{id:4,t:"4 days a week",s:"If you're ready"}];
+const EASY = [
+  {id:"no",     ic:ICON.bolt,  t:"Nope, I'm good to go",          s:"Standard plan"},
+  {id:"joints", ic:ICON.leaf,  t:"Go easy on my joints",          s:"Low-impact moves and seated options"},
+  {id:"injury", ic:ICON.heart, t:"I have an injury or limitation", s:"Gentle plan. Skip anything that hurts"},
+];
+const CAL_DAYS=[["MO","Mon"],["TU","Tue"],["WE","Wed"],["TH","Thu"],["FR","Fri"],["SA","Sat"],["SU","Sun"]];
+const DAY_ORDER=CAL_DAYS.map(x=>x[0]);
+const DOW={SU:0,MO:1,TU:2,WE:3,TH:4,FR:5,SA:6};
 
 function areaOf(w){
   if(/Cardio/.test(w)) return "cardio";
@@ -473,6 +513,23 @@ const W = {
       {n:"Stretch",t:4,w:"Stretch area",h:"Slow breaths while you stretch.",mu:["Full body"]}]},
     {k:"C",n:"Try a Class",ex:[
       {n:"Mind/body group fitness class",t:45,fixed:true,w:"Group fitness studio",h:"Check the class schedule on the Rec site. Arrive 5 minutes early and tell the instructor it's your first time.",mu:["Full body","Mind"],cls:true}]},
+  ],
+  gentle:[
+    {k:"A",n:"Seated Start",ex:[
+      {n:"Recumbent bike (the one with a seat back)",t:8,w:"Cardio area",h:"Low resistance. Sit back and pedal smoothly.",m:"bike"},
+      {n:"Chest press",s:2,r:"10 reps",w:"Machines",h:"Very light weight. Stop if anything pinches.",m:"chest-press"},
+      {n:"Seated cable row",s:2,r:"10 reps",w:"Cables",h:"Light and slow. Sit tall.",m:"cable-row"},
+      {n:"Seated stretch",t:4,w:"Stretch area",h:"Use a bench. Gentle stretches only, no bouncing.",mu:["Full body"]}]},
+    {k:"B",n:"Low-Impact Mix",ex:[
+      {n:"Elliptical",t:8,w:"Cardio area",h:"Smooth and low impact. Slow down any time.",m:"elliptical"},
+      {n:"Leg press",s:2,r:"10 reps",w:"Machines",h:"Light weight, small range. Only go as deep as feels okay.",m:"leg-press"},
+      {n:"Lat pulldown",s:2,r:"10 reps",w:"Machines",h:"Light weight. Pull to your upper chest.",m:"lat-pulldown"},
+      {n:"Stretch",t:4,w:"Stretch area",h:"Hold each stretch 20 seconds. Breathe slowly.",mu:["Full body"]}]},
+    {k:"C",n:"Easy Flow",ex:[
+      {n:"Flat treadmill walk or bike",t:10,w:"Cardio area",h:"No incline. Pick whichever feels better today.",m:"treadmill"},
+      {n:"Wall push-up",s:2,r:"8 reps",w:"Stretch area",h:"Hands on a wall at shoulder height. Lean in, push back.",mu:["Chest","Arms"]},
+      {n:"Glute bridge",s:2,r:"10 reps",w:"Stretch area",h:"Lie on a mat, feet flat. Lift your hips slowly.",mu:["Glutes","Core"]},
+      {n:"Box breathing",t:2,fixed:true,w:"Anywhere",h:"In 4, hold 4, out 4, hold 4.",mu:["Mind"]}]},
   ],
 };
 
@@ -563,9 +620,10 @@ const PHASES = [
 const LEVELS = [[0,"Cub"],[300,"Prowler"],[700,"Climber"],[1200,"Peak"],[2000,"Mountain Lion"]];
 
 // ---------- plan helpers ----------
-function comfort(){ return COMFORT.find(c=>c.id===(S.profile?.comfort||"new")); }
+function isEasy(){ return !!S.profile && !!S.profile.easy && S.profile.easy!=="no"; }
+function comfort(){ const c=COMFORT.find(x=>x.id===(S.profile?.comfort||"new")); return isEasy() ? Object.assign({},c,{f:Math.min(c.f,1.3),ds:Math.min(c.ds,0)}) : c; }
 function goalObj(){ return GOALS.find(x=>x.id===(S.profile?.goal||"start")); }
-function planList(){ const p=S.profile||{goal:"start",days:3}; const w=W[p.goal]; return Array.from({length:p.days},(_,i)=>w[i % w.length]); }
+function planList(){ const p=S.profile||{goal:"start",days:3}; const w=isEasy()?W.gentle:W[p.goal]; return Array.from({length:p.days},(_,i)=>w[i % w.length]); }
 function exAmt(e){
   const c=comfort();
   if(e.t){ const m = e.fixed ? e.t : Math.round(e.t*c.f); return `${m} min`; }
@@ -613,7 +671,67 @@ function topBar(){
     <button class="circle-btn" data-go="help" aria-label="Help">${ICON.help}</button></div></div>`;
 }
 function backBar(to,label="Back"){ return `<div class="top"><button class="back" data-go="${to}">${ICON.back}${label}</button></div>`; }
-const foot = `<p class="foot">A student project for UCCS students. Not an official UCCS app.<br>Rec hours from <a href="${REC}" target="_blank" rel="noopener">campusrec.uccs.edu</a> (Fall 2026). Crowd levels are sample estimates.</p>`;
+const foot = `<p class="foot">A student project for UCCS students. Not an official UCCS app.<br>Rec hours from <a href="${REC}" target="_blank" rel="noopener">campusrec.uccs.edu</a> (Fall 2026). Crowd levels are sample estimates.<br>We count anonymous visits to see if this helps. No names, no ad tracking.</p>`;
+
+// ---------- confidence check-in ----------
+function confCard(){
+  const n=S.log.length, key = n===1?"after-1":n===5?"after-5":null;
+  if(!key) return "";
+  if(S.conf[key]) return `<div class="card small"><b>Thanks!</b> Your answer helps show the Rec that this works.</div>`;
+  return `<div class="conf stack"><span class="eyebrow">Quick question · anonymous</span><h3>Do you feel more confident going to the Rec now?</h3>
+    <div class="conf-opts">${[["yes","Yes, more confident"],["little","A little"],["not-yet","Not yet"]].map(([v,t])=>`<button class="mini" data-act="conf" data-k="${key}" data-v="${v}">${t}</button>`).join("")}</div></div>`;
+}
+
+// ---------- calendar ----------
+function calState(){ if(!V._cal){ const d=S.profile?.days||3; V._cal={days: d===2?["TU","TH"]:d===4?["MO","TU","TH","FR"]:["MO","WE","FR"], time:10}; } return V._cal; }
+const stamp = d => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+function calInfo(){
+  const c=calState(), now=new Date(); let st=null;
+  for(let i=0;i<8 && !st;i++){ const d=new Date(now); d.setDate(now.getDate()+i); d.setHours(c.time,0,0,0); if(c.days.some(k=>DOW[k]===d.getDay()) && d>now) st=d; }
+  const dur=Math.max(30, Math.ceil((minutes(planList()[0])+10)/15)*15), en=new Date(st.getTime()+dur*6e4);
+  return {st, en, rr:`FREQ=WEEKLY;BYDAY=${c.days.join(",")}`};
+}
+const CAL_TITLE="Workout at the Rec (First Rep)", CAL_LOC="UCCS Recreation Center";
+function icsText(){
+  const {st,en,rr}=calInfo(), z=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
+  return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//First Rep//UCCS//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH","BEGIN:VEVENT",
+    `UID:firstrep-${Date.now()}@firstrep`,`DTSTAMP:${z(new Date())}`,`DTSTART:${stamp(st)}`,`DTEND:${stamp(en)}`,`RRULE:${rr}`,
+    `SUMMARY:${CAL_TITLE}`,`LOCATION:${CAL_LOC}`,`DESCRIPTION:Open First Rep for today's workout: ${APP_URL}`,
+    "BEGIN:VALARM","TRIGGER:-PT30M","ACTION:DISPLAY","DESCRIPTION:Workout at the Rec in 30 minutes","END:VALARM",
+    "END:VEVENT","END:VCALENDAR",""].join("\r\n");
+}
+function addCalendar(kind){
+  if(!calState().days.length) return;
+  if(kind==="google"){
+    const {st,en,rr}=calInfo();
+    const q=new URLSearchParams({action:"TEMPLATE",text:CAL_TITLE,dates:`${stamp(st)}/${stamp(en)}`,ctz:"America/Denver",details:`Open First Rep for today's workout: ${APP_URL}`,location:CAL_LOC,recur:`RRULE:${rr}`});
+    window.open("https://calendar.google.com/calendar/render?"+q.toString(),"_blank","noopener");
+  } else {
+    const ics=icsText();
+    const iOS=/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+    if(iOS){ location.href="data:text/calendar;charset=utf-8,"+encodeURIComponent(ics); }
+    else { const url=URL.createObjectURL(new Blob([ics],{type:"text/calendar;charset=utf-8"})); const a=document.createElement("a"); a.href=url; a.download="first-rep-workouts.ics"; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },4000); }
+  }
+  S.cal=true; save(); track("calendar/"+kind); toast("Opening your calendar"); keepScroll();
+}
+function calCard(){
+  const c=calState(), times=[];
+  for(let h=6;h<=21;h++){ const v=busyFor(1,h); times.push(`<option value="${h}" ${h===c.time?"selected":""}>${fmtH(h)}${v!==null&&v<45?" · usually quiet":""}</option>`); }
+  const closed=c.days.filter(k=>{ const [o,cl]=HOURS[DOW[k]]; return c.time<o || c.time>=cl; }).map(k=>CAL_DAYS.find(x=>x[0]===k)[1]);
+  return `<div class="card stack" id="cal">
+    <div class="row between"><h3>Put it on your calendar</h3>${S.cal?`<span class="chip a-free">Added</span>`:""}</div>
+    <p class="small muted">Pick your workout days and a time. Your phone reminds you 30 minutes before.</p>
+    <div class="daychips">${CAL_DAYS.map(([k,l])=>`<button class="dchip" aria-pressed="${c.days.includes(k)}" data-act="cal-day" data-d="${k}">${l}</button>`).join("")}</div>
+    <div class="row" style="gap:10px"><label class="small" for="cal-time"><b>Time</b></label><select id="cal-time" class="sel">${times.join("")}</select></div>
+    ${closed.length?`<p class="small" style="color:var(--bad);font-weight:700">The Rec isn't open at ${fmtH(c.time)} on ${closed.join(", ")}.</p>`:""}
+    <div class="cal-btns"><button class="btn btn-gold" data-act="cal-ics" ${c.days.length?"":"disabled"}>Apple / Outlook</button><button class="btn btn-ghost" data-act="cal-google" ${c.days.length?"":"disabled"}>Google Calendar</button></div>
+  </div>`;
+}
+function calPrompt(){
+  if(S.cal || S.calHide) return "";
+  return `<div class="card stack"><div class="row"><span class="mico a-machine">${ICON.calendar}</span><span style="flex:1;min-width:0"><b>Never miss a workout</b><div class="small muted">Add your workout days to your calendar with reminders.</div></span></div>
+    <div class="cal-btns"><button class="btn btn-gold" data-act="cal-open">Set it up</button><button class="btn btn-ghost" data-act="cal-hide">Not now</button></div></div>`;
+}
 const chip = w => `<span class="chip a-${areaOf(w)}">${w}</span>`;
 
 function weekStrip(){
@@ -644,7 +762,7 @@ V.start = () => {
     <div class="splash-hero">
       <span class="eyebrow">For UCCS students</span>
       <h1>Feeling lost in the <em>gym?</em></h1>
-      <p>Answer 3 quick questions and get a short workout plan made just for you. No account. No download.</p>
+      <p>Answer 4 quick questions and get a short workout plan made just for you. No account. No download.</p>
     </div>
     <ul class="promise">
       <li>${ICON.calendar}<span>A plan that fits your week</span></li>
@@ -659,13 +777,15 @@ V.start = () => {
     {q:"What's your main goal?", key:"goal", opts:GOALS.map(g=>({v:g.id,a:g.a,ic:g.ic,t:g.t,s:g.s}))},
     {q:"How comfortable are you at the gym?", key:"comfort", opts:COMFORT.map((c,i)=>({v:c.id,a:["stretch","machine","cable"][i],txt:c.ic,t:c.t,s:c.s}))},
     {q:"How many days a week can you go?", key:"days", opts:DAYS.map((d,i)=>({v:d.id,a:["free","cardio","machine"][i],txt:String(d.id),t:d.t,s:d.s}))},
+    {q:"Anything we should know?", key:"easy", opts:EASY.map((e,i)=>({v:e.id,a:["free","stretch","cardio"][i],ic:e.ic,t:e.t,s:e.s}))},
   ];
   const Q = qs[step-1];
   return `<div class="ob fade">
-    <div class="row between"><button class="back" data-act="ob-back">${ICON.back}Back</button><span class="small muted"><b>${step}</b> of 3</span></div>
-    <div class="steps">${[1,2,3].map(i=>`<i class="${i<=step?"on":""}"></i>`).join("")}</div>
+    <div class="row between"><button class="back" data-act="ob-back">${ICON.back}Back</button><span class="small muted"><b>${step}</b> of 4</span></div>
+    <div class="steps">${[1,2,3,4].map(i=>`<i class="${i<=step?"on":""}"></i>`).join("")}</div>
     <h1>${Q.q}</h1>
     <div class="choices">${Q.opts.map(o=>`<button class="choice a-${o.a}" aria-pressed="${p[Q.key]==o.v}" data-act="ob-pick" data-k="${Q.key}" data-v="${o.v}"><span class="ic ${o.txt?"txt":""}">${o.txt||o.ic}</span><span><b>${o.t}</b><span>${o.s}</span></span></button>`).join("")}</div>
+    ${Q.key==="easy"?`<p class="small muted">Your answer stays on your phone. If you have an injury, check with a health care provider before starting. UCCS students can start with the <a href="${WELLNESS}" target="_blank" rel="noopener">Wellness Center</a>.</p>`:""}
   </div>`;
 };
 
@@ -691,6 +811,7 @@ V.home = () => {
       <div class="stat c2"><b>${mins}</b><span>minutes this week</span></div>
       <div class="stat c3"><b>${S.log.length}</b><span>total workouts</span></div>
     </div>
+    ${calPrompt()}
     ${busyCard()}
     <div class="tiles">
       <button class="tile t-machine" data-go="machines">${ICON.machine}<b>Machine guides</b><span>How to use each one, step by step</span></button>
@@ -707,13 +828,15 @@ V.plan = () => {
   const ph=Math.min(wn,4)-1;
   return `<div class="stack-lg fade">${topBar()}
     <div class="stack"><span class="eyebrow">My plan · Week ${wn}</span><h1>${g.t}</h1>
-    <p class="muted">${p?p.days:3} workouts a week · ${c.t.toLowerCase()} level</p></div>
+    <p class="muted">${p?p.days:3} workouts a week · ${c.t.toLowerCase()} level${isEasy()?" · low-impact":""}</p></div>
     <div class="stack"><h3>Your first month</h3>
       <div class="phases">${PHASES.map((x,k)=>`<div class="ph ${k<ph?"past":k===ph?"cur":""}"><span class="small" style="font-size:.68rem;font-weight:700">WEEK ${k+1}</span><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")}</div></div>
     <div class="stack"><h3>This week</h3>
     <div class="list">${list.map((wk,k)=>`<button class="li" data-act="open-wk" data-i="${k}">
       <span class="badge-day ${k<done?"done":k===done?"next":""}">${k<done?ICON.tick:wk.k}</span>
       <span class="grow"><b>${wk.n}</b><div class="sub">${minutes(wk)} min · ${[...new Set(wk.ex.flatMap(exMuscles))].filter(m=>m!=="Heart"&&m!=="Mind").slice(0,3).join(", ")||"Full body"}</div></span>${ICON.chev}</button>`).join("")}</div></div>
+    ${calCard()}
+    ${isEasy()?`<div class="callout"><b>Gentle plan</b><span class="small">Seated and low-impact moves only. If you have an injury, get the okay from a health care provider first. UCCS students can start with the <a href="${WELLNESS}" target="_blank" rel="noopener">Wellness Center</a>.</span></div>`:""}
     <div class="callout gold"><b>Why so short?</b><span class="small">Short workouts you actually finish beat long ones you dread. Tell the app a workout felt too easy and the next ones grow.</span></div>
     <button class="btn btn-ghost" data-act="redo">Change my answers</button>
     ${foot}</div>`;
@@ -727,6 +850,7 @@ V.workout = () => {
     <div class="stack"><span class="eyebrow">${wk.n} · ${minutes(wk)} min</span><h1>Let's <span class="hl">go</span></h1>
     <div class="row"><div class="bar" style="flex:1"><i style="width:${n/wk.ex.length*100}%"></i></div><b class="small">${n}/${wk.ex.length}</b></div>
     <p class="muted small">Tap the circle when you finish each step. Use the rest timer between sets.</p></div>
+    ${isEasy()?`<div class="callout"><b>Listen to your body</b><span class="small">Skip any move that hurts. Pain is a stop sign, not a challenge.</span></div>`:""}
     <div class="list">${wk.ex.map((e,k)=>{ const a=areaOf(e.w); return `<div class="ex a-${a}">
       <button class="check ${ck[k]?"on":""}" aria-label="Mark ${e.n} done" aria-pressed="${!!ck[k]}" data-act="tick" data-k="${k}">${ICON.tick}</button>
       <div class="grow"><span class="name ${ck[k]?"done":""}">${e.n}</span>
@@ -752,6 +876,7 @@ V.done = () => {
       <span class="pts-pill">+100 Pride points</span>
     </div>
     <div class="card stack"><div class="row between"><b>${L.name}</b><span class="small muted">${L.next?`${L.next[0]-L.p} pts to ${L.next[1]}`:"Top level"}</span></div><div class="bar"><i style="width:${L.pct*100}%"></i></div></div>
+    ${confCard()}
     ${newB?`<div class="callout gold"><b>New badge: ${newB}</b><span class="small">See it on the Challenges tab.</span></div>`:""}
     <div class="stack"><h3>How did that feel?</h3>
       <div class="choices">
@@ -890,6 +1015,7 @@ V.help = () => `<div class="stack-lg fade">${backBar("home")}
     <a class="li a-free" href="${REC}/campus-rec" target="_blank" rel="noopener"><span class="mico">${ICON.star}</span><span class="grow"><b>UCCS Campus Rec website</b><div class="sub">Hours, memberships, closures</div></span>${ICON.chev}</a>
   </div>
   <div class="stack"><h3>Gym words, explained</h3><div class="list">${GLOSSARY.map(([t,s])=>`<details><summary>${t}</summary><p>${s}</p></details>`).join("")}</div></div>
+  <div class="card small muted"><b style="color:var(--ink)">Privacy.</b> Your plan and progress stay on this phone. We only count anonymous visits and taps (no names, no cookies) to see if First Rep helps students.</div>
   <button class="btn btn-ghost" data-act="reset">Reset this app on my phone</button>
   <p class="small muted" id="reset-note" hidden>Tap again to erase your plan and progress on this device.</p>
   ${foot}</div>`;
@@ -939,8 +1065,14 @@ function route(){
   document.querySelectorAll(".tab").forEach(b=>b.removeAttribute("aria-current"));
   if(t) document.querySelector(`.tab[data-go="${t}"]`)?.setAttribute("aria-current","page");
   if(h!=="workout") stopTimer();
-  try{ window.scrollTo(0,0); }catch(e){}
+  const target = V._scrollTo && document.getElementById(V._scrollTo); V._scrollTo=null;
+  try{ if(target) target.scrollIntoView({block:"start"}); else window.scrollTo(0,0); }catch(e){}
+  trackView(h);
 }
+let lastView=null;
+function trackView(h){ const v=h||"home"; if(v===lastView) return; lastView=v; pageview(v); }
+function keepScroll(){ const y=window.scrollY; route(); try{ window.scrollTo(0,y); }catch(e){} }
+document.addEventListener("change",e=>{ if(e.target.id==="cal-time"){ calState().time=+e.target.value; keepScroll(); } });
 function go(h){ if(location.hash==="#"+h) route(); else location.hash=h; }
 window.addEventListener("hashchange",route);
 
@@ -953,12 +1085,18 @@ document.addEventListener("click",e=>{
   const a=e.target.closest("[data-act]"); if(!a) return;
   const act=a.dataset.act;
   if(act==="ob-next"){ V._step=1; route(); }
-  else if(act==="ob-skip"){ S.profile={goal:"start",comfort:"new",days:3,since:iso(new Date())}; save(); go("home"); }
+  else if(act==="ob-skip"){ S.profile={goal:"start",comfort:"new",days:3,easy:"no",since:iso(new Date())}; save(); track("look-around/"+srcTag()); go("home"); }
   else if(act==="ob-back"){ V._step=Math.max(0,(V._step||0)-1); route(); }
   else if(act==="ob-pick"){
     const k=a.dataset.k, v=a.dataset.v; V._draft[k]= k==="days"? +v : v;
-    if(V._step<3){ V._step++; route(); }
-    else { S.profile={...V._draft, since:V._draft.since||iso(new Date())}; V._step=0; V._draft=null; save(); go("home"); toast("Your plan is ready"); }
+    if(V._step<4){ V._step++; route(); }
+    else {
+      const isNew=!S.profile;
+      S.profile={...V._draft, since:V._draft.since||iso(new Date())}; V._step=0; V._draft=null; V._cal=null; save();
+      if(isNew){ track("plan-created/"+srcTag()); track("goal/"+S.profile.goal); }
+      if(isEasy()) track("low-impact/"+S.profile.easy);
+      go("home"); toast("Your plan is ready");
+    }
   }
   else if(act==="redo"){ V._step=1; V._draft={...(S.profile||{})}; go("start"); }
   else if(act==="open-wk"){ V._wk=+a.dataset.i; S.pack.ck=[]; save(); go("workout"); }
@@ -970,6 +1108,9 @@ document.addEventListener("click",e=>{
     const before=badges().filter(b=>b.on).map(b=>b.n);
     const i=V._wk ?? nextIndex(), wk=planList()[i];
     S.log.push({d:iso(new Date()), w:wk.n, min:minutes(wk)}); S.pack.ck=[]; V._wk=undefined; save();
+    track("workout-finished");
+    if(S.log.length===1) track("first-workout/"+srcTag());
+    if(S.log.length===5) track("fifth-workout/"+srcTag());
     const nb=badges().find(b=>b.on && !before.includes(b.n)); V._newBadge=nb?nb.n:null; go("done"); confetti();
   }
   else if(act==="rate"){
@@ -980,6 +1121,12 @@ document.addEventListener("click",e=>{
   }
   else if(act==="chal"){ const m=wkManual(), id=a.dataset.id; m[id]=!m[id]; save(); route(); if(m[id]){ toast("+50 Pride points"); } }
   else if(act==="pack"){ const k="p"+a.dataset.k; S.pack[k]=!S.pack[k]; save(); const y=window.scrollY; route(); try{window.scrollTo(0,y);}catch(err){} }
+  else if(act==="conf"){ S.conf[a.dataset.k]=a.dataset.v; save(); track(`confidence-${a.dataset.k}/${a.dataset.v}`); keepScroll(); toast("Thanks for answering"); }
+  else if(act==="cal-day"){ const c=calState(), d=a.dataset.d; c.days = c.days.includes(d) ? c.days.filter(x=>x!==d) : [...c.days,d]; c.days.sort((x,y)=>DAY_ORDER.indexOf(x)-DAY_ORDER.indexOf(y)); keepScroll(); }
+  else if(act==="cal-ics"){ addCalendar("ics"); }
+  else if(act==="cal-google"){ addCalendar("google"); }
+  else if(act==="cal-open"){ V._scrollTo="cal"; go("plan"); }
+  else if(act==="cal-hide"){ S.calHide=true; save(); keepScroll(); }
   else if(act==="copy"){
     const ta=document.getElementById("invite"), txt=ta.value;
     const fallback=()=>{ ta.focus(); ta.select(); toast("Selected. Copy it from your keyboard menu."); };
