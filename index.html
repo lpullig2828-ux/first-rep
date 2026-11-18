@@ -293,6 +293,9 @@ summary::-webkit-details-marker{display:none}
 summary::after{content:"+";font-size:1.3rem;color:var(--gold-ink);font-weight:800}
 details[open] summary::after{content:"−"}
 details p{padding:0 16px 14px;color:var(--muted);font-size:.9rem}
+.ex details.howto{border-top:0}
+.ex details.howto summary{padding:6px 0;font-size:.88rem;justify-content:flex-start;gap:8px}
+.ex details.howto ol{margin:0 0 6px;padding-left:20px;font-size:.88rem;color:var(--muted);display:grid;gap:4px}
 
 /* tab bar */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
@@ -374,7 +377,7 @@ const S = Object.assign({ profile:null, log:[], manual:{}, pack:{}, conf:{}, cal
 const QS = new URLSearchParams(location.search);
 const SRC = (QS.get("utm_source")||QS.get("src")||"").toLowerCase().replace(/[^a-z0-9-]/g,"").slice(0,40);
 if(SRC && !S.src){ S.src=SRC; save(); }
-if(SRC) track("scan/"+SRC);
+if(SRC){ track("scan/"+SRC); try{ history.replaceState(null,"",location.pathname+location.hash); }catch(e){} } // count each scan once, not on every reload
 const srcTag = () => S.src || "direct";
 
 // ---------- dates ----------
@@ -429,7 +432,7 @@ const COMFORT = [
   {id:"some", ic:"1", t:"Been a few times",  s:"I know some of the basics", f:1.3, ds:1},
   {id:"comfy",ic:"2", t:"Pretty comfortable",s:"Give me a bit more",        f:1.7, ds:1},
 ];
-const DAYS = [{id:2,t:"2 days a week",s:"A solid start"},{id:3,t:"3 days a week",s:"Most popular"},{id:4,t:"4 days a week",s:"If you're ready"}];
+const DAYS = [{id:2,t:"2 days a week",s:"A solid start"},{id:3,t:"3 days a week",s:"Most popular"},{id:4,t:"4 days a week",s:"If you've got the time"}];
 const EASY = [
   {id:"no",     ic:ICON.bolt,  t:"Nope, I'm good to go",          s:"Standard plan"},
   {id:"joints", ic:ICON.leaf,  t:"Go easy on my joints",          s:"Low-impact moves and seated options"},
@@ -516,7 +519,7 @@ const W = {
   ],
   gentle:[
     {k:"A",n:"Seated Start",ex:[
-      {n:"Recumbent bike (the one with a seat back)",t:8,w:"Cardio area",h:"Low resistance. Sit back and pedal smoothly.",m:"bike"},
+      {n:"Recumbent bike (the one with a seat back)",t:8,w:"Cardio area",h:"Low resistance. Sit back and pedal smoothly.",m:"recumbent"},
       {n:"Chest press",s:2,r:"10 reps",w:"Machines",h:"Very light weight. Stop if anything pinches.",m:"chest-press"},
       {n:"Seated cable row",s:2,r:"10 reps",w:"Cables",h:"Light and slow. Sit tall.",m:"cable-row"},
       {n:"Seated stretch",t:4,w:"Stretch area",h:"Use a bench. Gentle stretches only, no bouncing.",mu:["Full body"]}]},
@@ -549,6 +552,11 @@ const MACHINES = {
     doit:["Pedal at a steady pace.","Raise resistance a level or two once you're warm.","Sit back. Don't lean all your weight on the handlebars."],
     breathe:"Breathe steadily. Slow down if you're gasping.",feel:"Light work in your thighs, never pain in your knees.",
     mistake:"Seat too low, which strains your knees.",start:"5 to 10 minutes at a comfortable pace."},
+  "recumbent":{n:"Recumbent Bike",area:"Cardio area",lvl:1,mu:["Heart","Quads","Glutes"],
+    setup:["This is the bike with a seat back, where your legs go out in front of you.","Sit down, then slide the seat forward or back with the lever under it.","With a pedal at its farthest point, your knee should be slightly bent, not locked."],
+    doit:["Lean back against the seat and pedal smoothly.","Keep resistance low (1 to 4) to start.","Rest your hands on the side handles."],
+    breathe:"Breathe steadily. You should be able to talk.",feel:"Easy work in your thighs, with your back supported.",
+    mistake:"Seat too far back, so your leg locks straight at the end of each pedal.",start:"8 to 10 minutes at low resistance."},
   "rower":{n:"Rowing Machine",area:"Cardio area",lvl:2,mu:["Back","Legs","Heart"],
     setup:["Strap your feet in so the strap crosses the widest part.","Set the damper (the side dial) to 3 to 5."],
     doit:["Push with your legs first.","Lean back slightly, then pull the handle to your ribs.","Return in reverse: arms, lean, legs."],
@@ -578,7 +586,20 @@ const MACHINES = {
     setup:["Pick weights from the rack and step back so others can reach it.","Start lighter than you think. You can always go up."],
     doit:["Move slowly and with control.","Finish your set, then put weights back where you found them."],
     breathe:"Breathe out on the hard part of each rep.",feel:"Controlled and steady. Never swinging.",
-    mistake:"Dropping dumbbells or leaving them on the floor.",start:"10 to 15 lb for most exercises."},
+    mistake:"Dropping dumbbells or leaving them on the floor.",start:"5 to 10 lb to start. Go up when the last reps feel easy."},
+};
+// How-to steps for moves that don't have their own machine guide (keyed by exercise name)
+const STRETCH_STEPS = ["Find an open mat or bench in the stretch area.","Stretch until you feel a gentle pull, never pain.","Hold 20 to 30 seconds while breathing slowly. No bouncing.","Easy ones to try: reach for your toes (back of legs), pull one heel to your butt (front of thigh), pull an arm across your chest (shoulder)."];
+const MOVES = {
+  "Plank":["Lie face down on a mat.","Prop yourself up on your elbows and toes, elbows under your shoulders.","Keep a straight line from head to heels. Don't let your hips sag.","Too hard? Drop to your knees. It still counts."],
+  "Goblet squat":["Pick one light dumbbell from the rack (5 to 10 lb to start).","Hold it upright against your chest with both hands.","Stand with feet a bit wider than your hips.","Sit back and down like into a chair, as low as feels okay.","Push through your heels to stand back up."],
+  "Dumbbell shoulder press":["Pick two light dumbbells (5 to 10 lb to start).","Sit on a bench with the back set upright.","Hold one in each hand at shoulder height, palms facing forward.","Press both straight up until your arms are almost straight.","Lower slowly back to your shoulders."],
+  "Glute bridge":["Lie on your back on a mat, knees bent, feet flat on the floor.","Squeeze your butt and lift your hips until your body makes a straight line from knees to shoulders.","Hold for a second at the top.","Lower slowly."],
+  "Dead bug":["Lie on your back on a mat.","Lift your arms straight up and your knees above your hips, bent like a table.","Press your lower back flat into the floor.","Slowly lower your right arm and left leg toward the floor, bring them back, then switch sides."],
+  "Wall push-up":["Stand an arm's length from a wall.","Put your hands on the wall at shoulder height, a bit wider than your shoulders.","Bend your elbows and lean your chest toward the wall.","Push back to start."],
+  "Box breathing":["Breathe in for 4 counts.","Hold for 4.","Breathe out for 4.","Hold for 4, then repeat."],
+  "Stretch":STRETCH_STEPS, "Full-body stretch":STRETCH_STEPS, "Cool-down walk + stretch":["Walk slowly for 2 minutes.",...STRETCH_STEPS],
+  "Seated stretch":["Sit on a bench.","Reach toward your toes with one leg straight out. Hold, then switch.","Pull one arm across your chest. Hold, then switch.","Slowly roll your shoulders and tilt your head side to side. Gentle only, no bouncing."],
 };
 const MICON = { "Cardio area":ICON.run, "Machines":ICON.machine, "Cables":ICON.bolt, "Free weights":ICON.machine };
 
@@ -608,8 +629,14 @@ const GLOSSARY = [
   ["Warm-up","5 to 10 minutes of easy movement to get your body ready."],
   ["Form","How you do the movement. Good form matters more than heavy weight."],
   ["Work in","Taking turns on a machine with someone between sets."],
-  ["Spotter","Someone who stands by to help if you can't finish a lift."],
-  ["PR","Personal record. Your best ever, like your heaviest leg press."],
+  ["Cardio","Anything that gets your heart rate up, like walking, biking or the elliptical."],
+  ["Resistance","How hard a cardio machine is to push or pedal. Higher number = harder."],
+  ["Incline","How steep the treadmill is. Higher number = more uphill."],
+  ["Low-impact","Moves that are easy on your joints, with no jumping or pounding."],
+  ["Core","The muscles around your stomach and lower back."],
+  ["Glutes","Your butt muscles."],
+  ["Quads / hamstrings","The front / back of your thighs."],
+  ["Lats","The big muscles on the sides of your back, under your armpits."],
 ];
 const PHASES = [
   ["Learn","Light weights. Focus on how each move feels."],
@@ -627,7 +654,7 @@ function planList(){ const p=S.profile||{goal:"start",days:3}; const w=isEasy()?
 function exAmt(e){
   const c=comfort();
   if(e.t){ const m = e.fixed ? e.t : Math.round(e.t*c.f); return `${m} min`; }
-  const s=Math.max(1,e.s+c.ds); return `${s} × ${e.r}`;
+  const s=Math.max(1,e.s+c.ds); return `${s} ${s===1?"set":"sets"} of ${e.r}`;
 }
 function minutes(wk){ const c=comfort(); return Math.round(wk.ex.reduce((a,e)=> a + (e.t ? (e.fixed?e.t:e.t*c.f) : Math.max(1,e.s+c.ds)*2), 0)); }
 function nextIndex(){ return Math.min(thisWeek().length, planList().length-1); }
@@ -671,13 +698,13 @@ function topBar(){
     <button class="circle-btn" data-go="help" aria-label="Help">${ICON.help}</button></div></div>`;
 }
 function backBar(to,label="Back"){ return `<div class="top"><button class="back" data-go="${to}">${ICON.back}${label}</button></div>`; }
-const foot = `<p class="foot">A student project for UCCS students. Not an official UCCS app.<br>Rec hours from <a href="${REC}" target="_blank" rel="noopener">campusrec.uccs.edu</a> (Fall 2026). Crowd levels are sample estimates.<br>We count anonymous visits to see if this helps. No names, no ad tracking.</p>`;
+const foot = `<p class="foot">A student project for UCCS students. Not an official UCCS app.<br>Rec hours from <a href="${REC}" target="_blank" rel="noopener">campusrec.uccs.edu</a> (Fall 2026). Crowd levels are sample estimates.<br>We count anonymous visits and taps to see if this helps. No names, no ad tracking.</p>`;
 
 // ---------- confidence check-in ----------
 function confCard(){
   const n=S.log.length, key = n===1?"after-1":n===5?"after-5":null;
   if(!key) return "";
-  if(S.conf[key]) return `<div class="card small"><b>Thanks!</b> Your answer helps show the Rec that this works.</div>`;
+  if(S.conf[key]) return `<div class="card small"><b>Thanks!</b> Your answer helps us learn if First Rep is working.</div>`;
   return `<div class="conf stack"><span class="eyebrow">Quick question · anonymous</span><h3>Do you feel more confident going to the Rec now?</h3>
     <div class="conf-opts">${[["yes","Yes, more confident"],["little","A little"],["not-yet","Not yet"]].map(([v,t])=>`<button class="mini" data-act="conf" data-k="${key}" data-v="${v}">${t}</button>`).join("")}</div></div>`;
 }
@@ -766,7 +793,7 @@ V.start = () => {
     </div>
     <ul class="promise">
       <li>${ICON.calendar}<span>A plan that fits your week</span></li>
-      <li>${ICON.machine}<span>How to use every machine</span></li>
+      <li>${ICON.machine}<span>How to use the machines in your plan</span></li>
       <li>${ICON.clock}<span>When the Rec is quiet</span></li>
     </ul>
     <div class="stack">
@@ -796,7 +823,7 @@ V.home = () => {
   const areas=[...new Set(wk.ex.map(e=>e.w))].slice(0,3);
   const tip=TIPS[Math.floor(Date.now()/864e5)%TIPS.length];
   return `<div class="stack-lg fade">${topBar()}
-    <div class="stack" style="gap:6px"><span class="eyebrow">${greet}</span><h1 style="font-size:2.2rem">${finished?"Week crushed.":"Let's get one <span class=\"hl\">rep</span> closer."}</h1></div>
+    <div class="stack" style="gap:6px"><span class="eyebrow">${greet}</span><h1 style="font-size:2.2rem">${finished?"Weekly goal done. Nice work.":"Let's get one <span class=\"hl\">rep</span> closer."}</h1></div>
     <div class="hero">
       <span class="eyebrow">${finished?"Weekly goal reached":`Workout ${i+1} of ${goal} this week`}</span>
       <h2>${finished?"Bonus round?":wk.n}</h2>
@@ -828,7 +855,7 @@ V.plan = () => {
   const ph=Math.min(wn,4)-1;
   return `<div class="stack-lg fade">${topBar()}
     <div class="stack"><span class="eyebrow">My plan · Week ${wn}</span><h1>${g.t}</h1>
-    <p class="muted">${p?p.days:3} workouts a week · ${c.t.toLowerCase()} level${isEasy()?" · low-impact":""}</p></div>
+    <p class="muted">${p?p.days:3} workouts a week · ${{new:"Beginner plan",some:"Some experience",comfy:"More experience"}[c.id]}${isEasy()?" · low-impact":""}</p></div>
     <div class="stack"><h3>Your first month</h3>
       <div class="phases">${PHASES.map((x,k)=>`<div class="ph ${k<ph?"past":k===ph?"cur":""}"><span class="small" style="font-size:.68rem;font-weight:700">WEEK ${k+1}</span><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")}</div></div>
     <div class="stack"><h3>This week</h3>
@@ -836,7 +863,7 @@ V.plan = () => {
       <span class="badge-day ${k<done?"done":k===done?"next":""}">${k<done?ICON.tick:wk.k}</span>
       <span class="grow"><b>${wk.n}</b><div class="sub">${minutes(wk)} min · ${[...new Set(wk.ex.flatMap(exMuscles))].filter(m=>m!=="Heart"&&m!=="Mind").slice(0,3).join(", ")||"Full body"}</div></span>${ICON.chev}</button>`).join("")}</div></div>
     ${calCard()}
-    ${isEasy()?`<div class="callout"><b>Gentle plan</b><span class="small">Seated and low-impact moves only. If you have an injury, get the okay from a health care provider first. UCCS students can start with the <a href="${WELLNESS}" target="_blank" rel="noopener">Wellness Center</a>.</span></div>`:""}
+    ${isEasy()?`<div class="callout"><b>Gentle plan</b><span class="small">Low-impact moves, with seated options. If you have an injury, get the okay from a health care provider first. UCCS students can start with the <a href="${WELLNESS}" target="_blank" rel="noopener">Wellness Center</a>.</span></div>`:""}
     <div class="callout gold"><b>Why so short?</b><span class="small">Short workouts you actually finish beat long ones you dread. Tell the app a workout felt too easy and the next ones grow.</span></div>
     <button class="btn btn-ghost" data-act="redo">Change my answers</button>
     ${foot}</div>`;
@@ -849,7 +876,7 @@ V.workout = () => {
   return `<div class="stack-lg fade">${backBar("home")}
     <div class="stack"><span class="eyebrow">${wk.n} · ${minutes(wk)} min</span><h1>Let's <span class="hl">go</span></h1>
     <div class="row"><div class="bar" style="flex:1"><i style="width:${n/wk.ex.length*100}%"></i></div><b class="small">${n}/${wk.ex.length}</b></div>
-    <p class="muted small">Tap the circle when you finish each step. Use the rest timer between sets.</p></div>
+    <p class="muted small">Tap the circle when you finish each step. "2 sets of 10 reps" means: do the move 10 times, rest about a minute, then do 10 more.</p></div>
     ${isEasy()?`<div class="callout"><b>Listen to your body</b><span class="small">Skip any move that hurts. Pain is a stop sign, not a challenge.</span></div>`:""}
     <div class="list">${wk.ex.map((e,k)=>{ const a=areaOf(e.w); return `<div class="ex a-${a}">
       <button class="check ${ck[k]?"on":""}" aria-label="Mark ${e.n} done" aria-pressed="${!!ck[k]}" data-act="tick" data-k="${k}">${ICON.tick}</button>
@@ -857,12 +884,14 @@ V.workout = () => {
         <div class="row" style="gap:8px;flex-wrap:wrap"><span class="amt">${exAmt(e)}</span>${chip(e.w)}</div>
         <span class="how">${e.h}</span>
         <div class="row" style="gap:6px;flex-wrap:wrap">${exMuscles(e).map(m=>`<span class="mchip">${m}</span>`).join("")}</div>
+        ${MOVES[e.n]?`<details class="howto"><summary>How to do it</summary><ol>${MOVES[e.n].map(s=>`<li>${s}</li>`).join("")}</ol></details>`:""}
         <div class="ex-actions">
           ${e.s?`<button class="mini" data-act="rest" data-sec="60" data-label="${e.n}">${ICON.timer}Rest 60s</button>`:""}
-          ${e.m?`<button class="mini" data-go="machine-${e.m}">How to use</button>`:""}
+          ${e.m && !MOVES[e.n]?`<button class="mini" data-act="guide" data-m="${e.m}">How to use</button>`:""}
           ${e.cls?`<a class="mini" href="${REC}/fitness" target="_blank" rel="noopener">Class schedule</a>`:""}
         </div></div></div>`;}).join("")}</div>
     <button class="btn ${all?"btn-gold":"btn-dark"}" data-act="finish">${all?"Finish workout · +100 pts":"I'm done for today · +100 pts"}</button>
+    <div class="stack"><h3>Confused by a word?</h3><div class="list">${GLOSSARY.map(([t,s])=>`<details><summary>${t}</summary><p>${s}</p></details>`).join("")}</div></div>
     </div>`;
 };
 
@@ -878,7 +907,7 @@ V.done = () => {
     <div class="card stack"><div class="row between"><b>${L.name}</b><span class="small muted">${L.next?`${L.next[0]-L.p} pts to ${L.next[1]}`:"Top level"}</span></div><div class="bar"><i style="width:${L.pct*100}%"></i></div></div>
     ${confCard()}
     ${newB?`<div class="callout gold"><b>New badge: ${newB}</b><span class="small">See it on the Challenges tab.</span></div>`:""}
-    <div class="stack"><h3>How did that feel?</h3>
+    <div class="stack"><h3>How did that feel?</h3><p class="small muted" style="margin-top:-6px">Tap one to finish.</p>
       <div class="choices">
         <button class="choice a-cardio" data-act="rate" data-v="-1"><span class="ic txt">−</span><span><b>Too hard</b><span>Make the next ones shorter</span></span></button>
         <button class="choice a-free" data-act="rate" data-v="0"><span class="ic txt">=</span><span><b>Just right</b><span>Keep it like this</span></span></button>
@@ -900,20 +929,20 @@ V.machines = () => `<div class="stack-lg fade">${topBar()}
 V.machine = id => {
   const m=MACHINES[id]; if(!m) return V.machines();
   const fresh = !S.profile, a=areaOf(m.area);
-  return `<div class="stack-lg fade a-${a}">${backBar(fresh?"start":"machines", fresh?"First Rep":"All machines")}
+  const back = V._fromWk && !fresh ? `<div class="top"><button class="back" data-act="back-wk">${ICON.back}Back to my workout</button></div>` : backBar(fresh?"start":"machines", fresh?"First Rep":"All machines");
+  return `<div class="stack-lg fade a-${a}">${back}
     <div class="mhead">
       <span class="eyebrow">${m.area}</span><h1>${m.n}</h1>
       <div class="row" style="gap:6px;flex-wrap:wrap">${m.mu.map(x=>`<span class="mchip">${x}</span>`).join("")}</div>
       <span class="lvl-dots">${[1,2,3].map(k=>`<i class="${k<=m.lvl?"on":""}"></i>`).join("")}&nbsp;${["","Beginner friendly","Easy to learn","Takes practice"][m.lvl]}</span>
     </div>
-    <div class="video"><span><span class="play">${ICON.play}</span><b>30-second demo</b>Filmed with Rec staff. Coming soon.</span></div>
     <div class="card stack" style="--a-fg:var(--on-color)"><h3>Set up</h3><ol class="num">${m.setup.map(s=>`<li>${s}</li>`).join("")}</ol></div>
     <div class="card stack" style="--a-fg:var(--on-color)"><h3>Do it</h3><ol class="num">${m.doit.map(s=>`<li>${s}</li>`).join("")}</ol></div>
     <div class="cue-grid"><div class="cue"><b>Breathing</b>${m.breathe}</div><div class="cue"><b>Should feel</b>${m.feel}</div></div>
     <div class="callout"><b>Common mistake</b><span class="small">${m.mistake}</span></div>
     <div class="callout gold"><b>Start here</b><span class="small">${m.start}</span></div>
     <p class="small muted">Still unsure? Ask any Rec staff member. Helping is their job, and everybody asks.</p>
-    ${fresh?`<button class="btn btn-gold" data-go="start">Get a plan in 3 taps</button>`:""}
+    ${fresh?`<button class="btn btn-gold" data-go="start">Get a plan in 4 quick questions</button>`:""}
     ${foot}</div>`;
 };
 
@@ -931,7 +960,7 @@ V.challenges = () => {
       <span class="eyebrow">Your level</span>
       <div class="row between" style="align-items:flex-end"><span class="big">${L.name}</span><b style="font-size:1.1rem">${L.p} pts</b></div>
       <div class="bar"><i style="width:${L.pct*100}%"></i></div>
-      <span class="small">${L.next?`${L.next[0]-L.p} points to ${L.next[1]}. Workouts are 100, challenges are 50.`:"You reached the top. Legend."}</span>
+      <span class="small">${L.next?`${L.next[0]-L.p} points to ${L.next[1]}. Workouts are 100, challenges are 50.`:"You reached the top level. Nice work."}</span>
     </div>
     <div class="stack"><div class="row between"><h2>This week</h2><span class="small muted">Resets Monday</span></div>
     <div class="list">${ch.map(c=>`<div class="chal"><div class="grow"><b>${c.t}</b><div class="small muted">${c.s}</div>
@@ -954,8 +983,7 @@ V.visit = () => {
     <div class="card stack a-machine" style="--a-fg:var(--on-color)"><h3>When you get there</h3><ol class="num">
       <li>Scan your student ID at the front desk.</li>
       <li>Drop your bag in the locker room.</li>
-      <li>Head to the cardio area and warm up for 5 minutes.</li>
-      <li>Open today's workout in this app and follow along.</li>
+      <li>Open today's workout in this app and follow along. It starts with an easy warm-up.</li>
       <li>Wipe down equipment when you're done.</li></ol></div>
     <div class="stack"><h3>The unwritten rules</h3>
       <div class="list">${ETIQUETTE.map(([t,s],k)=>`<div class="li a-${["cardio","machine","cable","free","stretch"][k]}" style="cursor:default"><span class="mico" style="width:36px;height:36px;font:800 1rem var(--display)">${k+1}</span><span class="grow"><b>${t}</b><div class="sub">${s}</div></span></div>`).join("")}</div></div>
@@ -970,7 +998,7 @@ V.explore = () => {
   const opts=[
     {a:"cardio",t:"Group fitness classes",g:"Good if you like being told what to do next",s:"Cardio, cycle, dance, martial arts, mind/body and strength classes.",u:`${REC}/fitness`},
     {a:"machine",t:"SOLE Climbing Wall",g:"Good if the weight room bores you",s:"Monday to Friday, 12 pm to 9 pm. $15 per term, and all gear is provided.",u:`${REC}/sole/climbing-wall`},
-    {a:"stretch",t:"Aquatic Center",g:"Good if you like low-impact workouts",s:"Lap pool and leisure pool. Currently closed for HVAC repairs, so check the Rec site before you go.",u:`${REC}/facilities/recreation-center`},
+    {a:"stretch",t:"Aquatic Center",g:"Good if you like low-impact workouts",s:"Lap pool and leisure pool. Check the Rec site for current hours and closures before you go.",u:`${REC}/facilities/recreation-center`},
     {a:"cable",t:"Intramurals + outdoor trips",g:"Good if you like a team",s:"Team sports and outdoor adventures with other students. Active without the weight room.",u:`${REC}/campus-rec`},
   ];
   return `<div class="stack-lg fade">${backBar("home")}
@@ -981,7 +1009,7 @@ V.explore = () => {
 };
 
 function inviteText(){
-  return `Want to hit the Rec with me this week? I'm using First Rep to ${goalObj().t.toLowerCase()}. It makes you a short plan in 3 taps. ${APP_URL}`;
+  return `Want to hit the Rec with me this week? I'm using First Rep to ${goalObj().t.toLowerCase()}. It makes you a short plan in 4 quick questions. ${APP_URL}`;
 }
 V.buddy = () => `<div class="stack-lg fade">${backBar("home")}
   <div class="stack"><span class="eyebrow">Bring a friend</span><h1>Better <span class="hl">together</span></h1>
@@ -1015,9 +1043,9 @@ V.help = () => `<div class="stack-lg fade">${backBar("home")}
     <a class="li a-free" href="${REC}/campus-rec" target="_blank" rel="noopener"><span class="mico">${ICON.star}</span><span class="grow"><b>UCCS Campus Rec website</b><div class="sub">Hours, memberships, closures</div></span>${ICON.chev}</a>
   </div>
   <div class="stack"><h3>Gym words, explained</h3><div class="list">${GLOSSARY.map(([t,s])=>`<details><summary>${t}</summary><p>${s}</p></details>`).join("")}</div></div>
-  <div class="card small muted"><b style="color:var(--ink)">Privacy.</b> Your plan and progress stay on this phone. We only count anonymous visits and taps (no names, no cookies) to see if First Rep helps students.</div>
+  <div class="card small muted"><b style="color:var(--ink)">Privacy.</b> Your plan, workout history and answers are saved only on this phone. To see if First Rep helps students, we count anonymous totals: screens opened, plans made, workouts finished, your goal, and your answer to the confidence question. Never your name, never your injury answer. No accounts, no cookies, no ads. Anyone using this phone's browser can see your plan, so use Reset below to clear it.</div>
   <button class="btn btn-ghost" data-act="reset">Reset this app on my phone</button>
-  <p class="small muted" id="reset-note" hidden>Tap again to erase your plan and progress on this device.</p>
+  <p class="small muted" id="reset-note" hidden>Tap again to erase your plan and progress on this device. Anonymous counts already sent can't be linked back to you.</p>
   ${foot}</div>`;
 
 // ---------- rest timer ----------
@@ -1076,12 +1104,12 @@ document.addEventListener("change",e=>{ if(e.target.id==="cal-time"){ calState()
 function go(h){ if(location.hash==="#"+h) route(); else location.hash=h; }
 window.addEventListener("hashchange",route);
 
-function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),2200); }
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),msg.length>60?5000:2200); }
 
 let resetArmed=false;
 document.addEventListener("click",e=>{
   const g=e.target.closest("[data-go]");
-  if(g){ e.preventDefault(); const to=g.dataset.go; if(to==="workout"){ V._wk=undefined; S.pack.ck=[]; save(); } go(to); return; }
+  if(g){ e.preventDefault(); const to=g.dataset.go; V._fromWk=false; if(to==="workout"){ V._wk=undefined; S.pack.ck=[]; save(); } go(to); return; }
   const a=e.target.closest("[data-act]"); if(!a) return;
   const act=a.dataset.act;
   if(act==="ob-next"){ V._step=1; route(); }
@@ -1094,13 +1122,14 @@ document.addEventListener("click",e=>{
       const isNew=!S.profile;
       S.profile={...V._draft, since:V._draft.since||iso(new Date())}; V._step=0; V._draft=null; V._cal=null; save();
       if(isNew){ track("plan-created/"+srcTag()); track("goal/"+S.profile.goal); }
-      if(isEasy()) track("low-impact/"+S.profile.easy);
       go("home"); toast("Your plan is ready");
     }
   }
   else if(act==="redo"){ V._step=1; V._draft={...(S.profile||{})}; go("start"); }
   else if(act==="open-wk"){ V._wk=+a.dataset.i; S.pack.ck=[]; save(); go("workout"); }
   else if(act==="tick"){ const k=+a.dataset.k; S.pack.ck=S.pack.ck||[]; S.pack.ck[k]=!S.pack.ck[k]; save(); const y=window.scrollY; route(); try{window.scrollTo(0,y);}catch(err){} }
+  else if(act==="guide"){ V._fromWk=true; go("machine-"+a.dataset.m); }
+  else if(act==="back-wk"){ V._fromWk=false; go("workout"); } // keeps this workout and its checkmarks
   else if(act==="rest"){ startTimer(+a.dataset.sec, a.dataset.label); }
   else if(act==="t-add"){ if(T){ T.end+=15000; T.total+=15; drawTimer(); } }
   else if(act==="t-stop"){ stopTimer(); }
@@ -1116,7 +1145,7 @@ document.addEventListener("click",e=>{
   else if(act==="rate"){
     const v=+a.dataset.v, order=["new","some","comfy"], cur=order.indexOf(S.profile.comfort||"new");
     const nx=Math.max(0,Math.min(2,cur+v)); S.profile.comfort=order[nx]; save();
-    toast(v===0?"Got it. Same next time.":nx===cur?"You're already at that level.":v>0?"Next workouts will be a bit longer.":"Next workouts will be a bit shorter.");
+    toast(v===0?"Got it. Same next time.":nx===cur&&v<0?"Got it. Next time use lighter weights, do fewer sets and skip anything that doesn't feel right. It all still counts.":nx===cur?"You're already at the top level. Try a little more weight.":v>0?"Next workouts will be a bit longer.":"Next workouts will be a bit shorter.");
     go("home");
   }
   else if(act==="chal"){ const m=wkManual(), id=a.dataset.id; m[id]=!m[id]; save(); route(); if(m[id]){ toast("+50 Pride points"); } }
@@ -1134,7 +1163,7 @@ document.addEventListener("click",e=>{
   }
   else if(act==="reset"){
     if(!resetArmed){ resetArmed=true; document.getElementById("reset-note").hidden=false; a.textContent="Yes, reset everything"; return; }
-    try{ localStorage.removeItem(KEY); }catch(err){} location.hash=""; location.reload();
+    try{ localStorage.removeItem(KEY); }catch(err){} location.replace(location.pathname);
   }
 });
 
